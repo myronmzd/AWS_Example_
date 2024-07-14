@@ -9,7 +9,7 @@ fi
 
 $BUCKET_NAME = $1
 
-aws s3api create-bucket.\
+aws s3api create-bucketr
 --bucket $BUCKET_NAME
 --create--bucket-configuration="LocationConstraint=ap-south-1".\
 --query Location
