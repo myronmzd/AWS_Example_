@@ -7,4 +7,9 @@ tasks:
       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
       unzip awscliv2.zip
       sudo ./aws/install
-      cd $THETA_WORKSPACE_ROOT        
+      cd $THETA_WORKSPACE_ROOT/AWS_Example_ 
+  - init: |
+      echo "export AWS_CLI_AUTO_PROMPT=on-partial" >> ~/.bashrc
+      source ~/.bashrc
+    command: |
+      aws configure
