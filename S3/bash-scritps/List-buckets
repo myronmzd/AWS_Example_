@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-echo "=listing buckets which is created latest"
-aws s3api list-buckets --query 'Buckets[*].{Name: Name, CreationDate: CreationDate}' | jq -r 'sort_by(.CreationDate) | reverse | .[] | .Name'
+echo "=listing buckets which is created latest five buckets "
+aws s3api list-buckets --query 'Buckets[*].{Name: Name, CreationDate: CreationDate}' | jq -r 'sort_by(.CreationDate) | reverse | .[0:5] | .[] |.Name'
