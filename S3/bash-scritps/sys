@@ -1,1 +1,45 @@
 #!/usr/bin/env bash
+
+echo "==sysnc"
+
+# exit if any comand returns a non-zero status 
+set -e
+
+# check for a bucket name 
+if [ -z "$1" ]; then 
+    echo "There needs to be a bucket name eg - /bucket/my-bucket-name"
+    exit 1
+fi 
+
+# for make a new folder 
+if [ -z "$2" ]; then 
+    echo "There needs to be a new folder name eg - /bucket/prefix/files"
+    exit 1
+fi 
+
+FOLDER_NAME_PREFIX=$2
+BUCKET_NAME=$1
+
+# where we store all the files 
+OUTPUT_DIR="/tmp/S3-bash-scritps"
+
+#remove folder if it exist 
+rm -r $OUTPUT_DIR
+
+# create a directory to store files 
+mkdir -p $OUTPUT_DIR
+
+# Generate a random number of files to create (between 1 and 20)
+num_files=$((RANDOM % 20 + 1))
+
+for ((i =1 ; i<=$num_files; i++)) do
+    
+    # Create a unique filename using timestamp and random number
+    filename="$OUTPUT_DIR/file_$i.txt"
+
+    dd if=/dev/urandom of=$filename bs=1K count=$((RANDOM % 1024 + 1)) 2>/dev/null
+done 
+
+tree $OUTPUT_DIR
+
+aws s3 sync $OUTPUT_DIR s3://$BUCKET_NAME/$FOLDER_NAME_PREFIX/files
