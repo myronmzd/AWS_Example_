@@ -1,1 +1,25 @@
 #!/usr/bin/env bash
+
+echo "==put-object"
+
+# check for a bucket name 
+if [ -z "$1" ]; then 
+    echo "There needs to be a bucket name eg - /bucket/my-bucket-name"
+    exit 1
+fi 
+
+# for make a new folder 
+if [ -z "$2" ]; then 
+    echo "There needs to be a new file name eg - /bucket/prefix/files file name " 
+    exit 1
+fi 
+
+FILE_NAME=$2
+BUCKET_NAME=$1
+
+OBJECT_KEY=$(basename "$FILE_NAME")
+
+aws s3api put-object \
+-- bucket $BUCKET_NAME \
+-- key $OBJECT_KEY \
+-- body $FILE_NAME    

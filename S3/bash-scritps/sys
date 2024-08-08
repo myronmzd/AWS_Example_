@@ -24,6 +24,7 @@ BUCKET_NAME=$1
 OUTPUT_DIR="/tmp/S3-bash-scritps"
 
 #remove folder if it exist 
+#some time you will have to comment this when running this for the firt time  
 rm -r $OUTPUT_DIR
 
 # create a directory to store files 
@@ -42,4 +43,4 @@ done
 
 tree $OUTPUT_DIR
 
-aws s3 sync $OUTPUT_DIR s3://$BUCKET_NAME/$FOLDER_NAME_PREFIX/files
+aws s3 sync $OUTPUT_DIR s3://$BUCKET_NAME/$FOLDER_NAME_PREFIX/
