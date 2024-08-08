@@ -15,8 +15,5 @@ tasks:
   - init: |
       echo "export AWS_CLI_AUTO_PROMPT=on-partial" >> ~/.bashrc
       source ~/.bashrc
-  - name: Initialize
-    command: |
-      bucket=$(./workspace/AWS_Example_/S3/bash-scritps/List-buckets)
-      echo "MY_bucket is: $bucket"
+  
 
