@@ -17,7 +17,7 @@ tasks:
       source ~/.bashrc
   - name: Initialize
     command: |
-      source ./latest-one-bucket
-      bucket=$(./latest-one-bucket)
+      source ./workspace/AWS_Example_/S3/bash-scritps/latest-one-bucket
+      bucket=$(./workspace/AWS_Example_/S3/bash-scritps/latest-one-bucket)
       echo "MY_bucket is: $bucket"
 
