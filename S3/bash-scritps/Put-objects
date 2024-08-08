@@ -14,10 +14,12 @@ if [ -z "$2" ]; then
     exit 1
 fi 
 
-FILE_NAME=$2
 BUCKET_NAME=$1
+FILE_NAME=$2
+
 
 OBJECT_KEY=$(basename "$FILE_NAME")
+echo $OBJECT_KEY
 
 aws s3api put-object \
 -- bucket $BUCKET_NAME \
