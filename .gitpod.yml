@@ -18,5 +18,6 @@ tasks:
   - name: Initialize
     command: |
       source ./latest-one-bucket
+      bucket=$(./latest-one-bucket)
       echo "MY_bucket is: $bucket"
 
