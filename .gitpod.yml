@@ -3,6 +3,16 @@ tasks:
     before: |
       sudo apt-get install tree
       sudo apt-get install jq
+# https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.4
+  - name: powershell
+    before: |
+      sudo apt-get update
+      sudo apt-get install -y wget apt-transport-https software-properties-common  
+      source /etc/os-release
+      wget -q https://packages.microsoft.com/config/ubuntu/$VERSION_ID/packages-microsoft-prod.deb
+      sudo dpkg -i packages-microsoft-prod.deb
+      rm packages-microsoft-prod.deb
+      sudo apt-get update
   - name: aws-cli
     env:
         export AWS_CLI_AUTO_PROMT: on-partial
