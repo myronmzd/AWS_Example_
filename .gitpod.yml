@@ -29,6 +29,6 @@ tasks:
     before: |
       pip install boto3>=1.15.0
       pip3 install boto3
-      pip show boto3
+      
 
 
