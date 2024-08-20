@@ -27,7 +27,6 @@ tasks:
       source ~/.bashrc
   - name: pythonSDk
     before: |
-      pip install boto3>=1.15.0
       pip3 install boto3
       
 
