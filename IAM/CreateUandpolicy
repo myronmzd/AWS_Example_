@@ -1,0 +1,42 @@
+#!/bin/bash
+
+echo  "==Create a user and give policys"
+
+# check for a bucket name 
+if [ -z "$1" ]; then 
+    echo "There needs to be a user name eg - myron_zion_cake as user an admin"
+    exit 1
+fi 
+
+BUCKET_NAME=$1
+
+#If a user downgrades their own access 
+#and no other admin or the root user can intervene, you may need AWS Support’s assistance to recover access.
+
+# Variables
+USERNAME=$1
+POLICY_NAME="IAMFullAccessPolicy"
+
+# Create IAM user
+aws iam create-user --user-name $USERNAME
+
+# Create a custom policy that allows full access to IAM
+aws iam create-policy --policy-name $POLICY_NAME \
+--policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:*",
+            "Resource": "*"
+        }
+    ]
+}'
+
+# Attach the custom policy to the user
+#POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].Arn" --output text)
+POLICY_ARN=$(aws iam list-policies --output json | jq -r ".Policies[] | select(.PolicyName == \"$POLICY_NAME\") | c")
+aws iam attach-user-policy --user-name $USERNAME --policy-arn $POLICY_ARN
+
+# Output confirmation
+echo "User $USERNAME created and $POLICY_NAME policy attached."
