@@ -16,27 +16,35 @@ BUCKET_NAME=$1
 # Variables
 USERNAME=$1
 POLICY_NAME="IAMFullAccessPolicy"
+POLICY_EXISTS=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].PolicyName" --output text)
 
 # Create IAM user
 aws iam create-user --user-name $USERNAME
 
-# Create a custom policy that allows full access to IAM
-aws iam create-policy --policy-name $POLICY_NAME \
---policy-document '{
-    "Version": "2012-10-17",
-    "Statement": [
+
+if [ "$POLICY_NAME" == "$POLICY_EXISTS" ]; then 
+
+    echo "Policy '$POLICY_NAME' exists."
+
+else 
+    # Create a custom policy that allows full access to IAM
+    aws iam create-policy --policy-name $POLICY_NAME --policy-document '{
+       "Version": "2012-10-17",
+        "Statement": [
         {
             "Effect": "Allow",
             "Action": "iam:*",
             "Resource": "*"
-        }
-    ]
-}'
+        }       
+                     ]
+       }'
+fi
 
 # Attach the custom policy to the user
-#POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].Arn" --output text)
-POLICY_ARN=$(aws iam list-policies --output json | jq -r ".Policies[] | select(.PolicyName == \"$POLICY_NAME\") | .Arn")
-aws iam attach-user-policy --user-name $USERNAME --policy-arn $POLICY_ARN
+POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].Arn" --output text)
+#POLICY_ARN=$(aws iam list-policies --output json | jq -r ".Policies[] | select(.PolicyName == \"$POLICY_NAME\") | .Arn")
+echo "$POLICY_ARN"
+#aws iam attach-user-policy --user-name $USERNAME --policy-arn $POLICY_AR
 
 # Output confirmation
 echo "User $USERNAME created and $POLICY_NAME policy attached."
