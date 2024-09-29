@@ -4,7 +4,7 @@ echo  "==Create a user and give policys"
 
 # check for a bucket name 
 if [ -z "$1" ]; then 
-    echo "There needs to be a user name eg - myron_zion_cake as user an admin"
+    echo "There needs to be a user name eg -myron_zion_cake as user an admin"
     exit 1
 fi 
 
@@ -35,7 +35,7 @@ aws iam create-policy --policy-name $POLICY_NAME \
 
 # Attach the custom policy to the user
 #POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].Arn" --output text)
-POLICY_ARN=$(aws iam list-policies --output json | jq -r ".Policies[] | select(.PolicyName == \"$POLICY_NAME\") | c")
+POLICY_ARN=$(aws iam list-policies --output json | jq -r ".Policies[] | select(.PolicyName == \"$POLICY_NAME\") | .Arn")
 aws iam attach-user-policy --user-name $USERNAME --policy-arn $POLICY_ARN
 
 # Output confirmation
