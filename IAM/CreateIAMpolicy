@@ -1,0 +1,51 @@
+#!/bin/bash
+
+echo  "==Create a user and give policys"
+
+# check for a bucket name 
+if [ -z "$1" ]; then 
+    echo "There needs to a custom policy name"
+    exit 1
+fi 
+
+POLICY_NAME=$1
+
+
+
+if [ "$POLICY_NAME" == "$POLICY_EXISTS" ]; then 
+
+    echo "Policy '$POLICY_NAME' exists."
+
+else 
+    # Create a custom policy that allows full access to IAM
+    aws iam create-policy --policy-name $POLICY_NAME --policy-document \
+    {
+  "Version": "2012-10-17",
+
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*",
+        "arn:aws:s3:::*/*"
+      ],
+      "Condition": {
+        "StringLike": {
+            "aws:PrincipalTag/Groups": "JDadmin"}
+        "IpAddress": { 
+            "aws:SourceIp": 45.127.44.0/24 
+        }
+      }
+    }
+  ]
+}
+
+
+
+fi
+
