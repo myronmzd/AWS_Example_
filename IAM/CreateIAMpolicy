@@ -18,11 +18,9 @@ if [ "$POLICY_NAME" == "$POLICY_EXISTS" ]; then
 
 else 
     # Create a custom policy that allows full access to IAM
-    aws iam create-policy --policy-name $POLICY_NAME --policy-document \
-    {
+    aws iam create-policy --policy-name $POLICY_NAME --policy-document '{
   "Version": "2012-10-17",
-
-  "Statement": [
+      "Statement": [
     {
       "Effect": "Allow",
       "Action": [
@@ -36,14 +34,15 @@ else
       ],
       "Condition": {
         "StringLike": {
-            "aws:PrincipalTag/Groups": "JDadmin"}
-        "IpAddress": { 
-            "aws:SourceIp": 45.127.44.0/24 
+          "aws:PrincipalTag/Groups": "JDadmin"
+        },
+        "IpAddress": {
+          "aws:SourceIp": "45.127.44.0/24"
         }
       }
     }
-  ]
-}
+      ]
+}'
 
 
 
