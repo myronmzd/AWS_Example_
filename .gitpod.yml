@@ -28,7 +28,6 @@ tasks:
   - name: pythonSDk_AWS_Aamplify
     before: |
       pip3 install boto3
-      npm install -g @aws-amplify/cli
 
       
 
