@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+echo  "==Upload a file in bucket"
+
+# check for a bucket name 
+if [ -z "$1" ]; then 
+    echo "There needs to be a bucket name eg - /bucket/my-bucket-name"
+    exit 1
+fi 
+
+BUCKET_NAME=$1
+
+
+
+aws s3api copy-object /workspace/AWS_Example_/AWS_Projects/output.zip --bucket $BUCKET_NAME \
