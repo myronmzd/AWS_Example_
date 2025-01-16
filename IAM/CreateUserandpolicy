@@ -8,18 +8,39 @@ if [ -z "$1" ]; then
     exit 1
 fi 
 
+echo "Select an option:"
+echo "1. only user"
+echo "2. Find policy"
+echo "2. User and policy"
+
 BUCKET_NAME=$1
 
 #If a user downgrades their own access 
 #and no other admin or the root user can intervene, you may need AWS Support’s assistance to recover access.
 
+
+case $choice in
+1)
+# Create IAM user
+aws iam create-user --user-name $USERNAME
+
+2)
+
 # Variables
+# check for a bucket name 
+echo "Kindly enter the policie"
+if [ -z "$1" ]; then 
+    echo "you must enter the policie"
+    exit 1
+fi 
+
+
 USERNAME=$1
 POLICY_NAME="IAMFullAccessPolicy"
 POLICY_EXISTS=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].PolicyName" --output text)
 
-# Create IAM user
-aws iam create-user --user-name $USERNAME
+
+
 
 
 if [ "$POLICY_NAME" == "$POLICY_EXISTS" ]; then 
