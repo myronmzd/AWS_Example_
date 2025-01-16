@@ -8,12 +8,12 @@ while true; do
         echo "1. Find users exist and there groups"
         echo "2. Find group and its users"
         echo "3. Create a IAM user "
-        echo "3. Create a New access key for NEW IAM user "
-        echo "3. delete access key and disable old access key "
-        echo "4. Find group policy"
-        echo "5. User and group and add user to group"
-        echo "6. group and policy and add policy to group"
-        echo "6. exit"
+        echo "4. Create a New access key for NEW IAM user "
+        echo "5. delete access key and disable old access key "
+        echo "6. Find group policy"
+        echo "7. User and group and add user to group"
+        echo "8. group and policy and add policy to group"
+        echo "9. exit"
 
         case $choice in
         1)
@@ -68,26 +68,83 @@ while true; do
             echo "Failed to create IAM user '$USER_NAME'."
         fi
 
-        3)
-        # "Create a New access key for NEW IAM user "
+        4)
+        # Prompt user for the IAM username
         read -p "Enter the name of the IAM User: " USER_NAME
 
+        # Check if the user entered a name
+        if [ -z "$USER_NAME" ]; then
+            echo "Error: IAM User name cannot be empty."
+            exit 1
+        fi
+
+        # List access keys for the IAM user
         ACCESS_KEYS=$(aws iam list-access-keys --user-name "$USER_NAME" --query 'AccessKeyMetadata' --output text)
 
-        aws iam create-access-key --user-name MyNewUse
+        # Check if the user has existing access keys
+        if [ -z "$ACCESS_KEYS" ]; then
+            echo "No access keys found for user $USER_NAME. Creating a new access key..."
+            NEW_ACCESS_KEY=$(aws iam create-access-key --user-name "$USER_NAME")
 
-        3)
+            # Check if the access key was successfully created ]]]] $? -eq 0  error codes the previous command was 
+            if [ $? -eq 0 ]; then
+                echo "New access key created successfully for user $USER_NAME:"
+                echo "$NEW_ACCESS_KEY"
+            else
+                echo "Error: Failed to create a new access key for user $USER_NAME."
+            fi
+        else
+            echo "Access keys found for user $USER_NAME. Please delete the existing keys before creating a new one."
+        fi
+
+
+        5)
         # "delete access key and disable old access key "
+        # Prompt user for the IAM username
+        read -p "Enter the name of the IAM User: " USER_NAME
 
-        3)
-        # "4. Find group policy"
+        # Check if the user entered a name
+        if [ -z "$USER_NAME" ]; then
+            echo "Error: IAM User name cannot be empty."
+            exit 1
+        fi
 
-        3)
-        #  "5. User and group and add user to group"
+        # Assuming USER_NAME is already set
+        ACCESS_KEYS=$(aws iam list-access-keys --user-name "$USER_NAME" --query 'AccessKeyMetadata[*].AccessKeyId' --output text)
+
+        if [ -z "$ACCESS_KEYS" ]; then
+        echo "No access keys found for user: $USER_NAME"
+        exit 0
+        fi
+
+        echo "Access keys for $USER_NAME: $ACCESS_KEYS"
+
+        for ACCESS_KEY_ID in $ACCESS_KEYS; do
+        echo "Deleting access key: $ACCESS_KEY_ID for user: $USER_NAME"
+        aws iam delete-access-key --user-name "$USER_NAME" --access-key-id "$ACCESS_KEY_ID"
+
+        if [ $? -eq 0 ]; then
+            echo "Successfully deleted access key: $ACCESS_KEY_ID"
+        else
+            echo "Failed to delete access key: $ACCESS_KEY_ID"
+        fi
+        done
+
 
 
         6)
+        # "4. Find group policy"
+
+        7)
+        #  "5. User and group and add user to group"
+
+
+        8)
             #  "6. group and policy and add policy to group"
+
+        9)
+            # exit
+
 
     esac
 done
