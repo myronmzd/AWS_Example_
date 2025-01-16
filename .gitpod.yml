@@ -34,7 +34,8 @@ tasks:
 
       aws --version
       cd $THETA_WORKSPACE_ROOT/AWS_Example_
-
+      rm -rf ~/.aws
+      
   - name: Setup
     command: |
       # Run any additional setup commands here

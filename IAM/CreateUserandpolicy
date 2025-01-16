@@ -1,70 +1,135 @@
 #!/bin/bash
 
-echo  "==Create a user and give policys"
+while true; do
 
-# check for a bucket name 
-if [ -z "$1" ]; then 
-    echo "There needs to be a user name eg -myron_zion_cake as user an admin"
-    exit 1
-fi 
+        echo  "==Create a user or find policys and give policy to same user "
 
-echo "Select an option:"
-echo "1. only user"
-echo "2. Find policy"
-echo "2. User and policy"
+        echo "Select an option:"
+        echo "1. Find users exist and there groups"
+        echo "2. Find group and its users"
+        echo "3. Create a IAM user "
+        echo "3. Create a New access key for NEW IAM user "
+        echo "3. delete access key and disable old access key "
+        echo "4. Find group policy"
+        echo "5. User and group and add user to group"
+        echo "6. group and policy and add policy to group"
+        echo "6. exit"
 
-BUCKET_NAME=$1
+        case $choice in
+        1)
+        # List all users
+        USERS=$(aws iam list-users --query "Users[].UserName" --output text)
+        echo "List of users $USERS "
 
-#If a user downgrades their own access 
-#and no other admin or the root user can intervene, you may need AWS Support’s assistance to recover access.
+        # Loop through each user and find their groups
+        for USER in $USERS; do
+            echo "Checking groups for user: $USER"
+
+            read "Enter the name "
+            # List the groups for each user
+            GROUPS=$(aws iam list-groups-for-user --user-name "$USER" --query "Groups[].GroupName" --output text)
+
+            if [ -n "$GROUPS" ]; then
+                echo "User '$USER' is part of the following groups: $GROUPS"
+            else
+                echo "User '$USER' is not part of any groups."
+            fi
+        done
+
+        2)
+        # Check if the group exists
+        GROUP_EXISTS=$(aws iam list-groups --query "Groups[?GroupName=='$GROUP_NAME'].GroupName" --output text)
+
+        if [ "$GROUP_NAME" == "$GROUP_EXISTS" ]; then
+            echo "Group '$GROUP_NAME' exists."
+            echo "Listing users in group '$GROUP_NAME'..."
+
+            # List users in the group
+            aws iam get-group --group-name "$GROUP_NAME" --query "Users[].UserName" --output text
+        else
+            echo "Group '$GROUP_NAME' does not exist."
+        fi
+
+        3)
+        # 3. Create an IAM user
+        read -p "Enter the name of the User: " USER_NAME
+        # Check if the user has entered a value
+        if [ -z "$USER_NAME" ]; then
+            echo "User name cannot be empty. Please try again."
+            exit 1
+        fi
+
+        # Create the IAM user
+        aws iam create-user --user-name "$USER_NAME"
+        # Check if the user creation was successful
+        if [ $? -eq 0 ]; then
+            echo "IAM user '$USER_NAME' created successfully."
+        else
+            echo "Failed to create IAM user '$USER_NAME'."
+        fi
+
+        3)
+        # "Create a New access key for NEW IAM user "
+        read -p "Enter the name of the IAM User: " USER_NAME
+
+        ACCESS_KEYS=$(aws iam list-access-keys --user-name "$USER_NAME" --query 'AccessKeyMetadata' --output text)
+
+        aws iam create-access-key --user-name MyNewUse
+
+        3)
+        # "delete access key and disable old access key "
+
+        3)
+        # "4. Find group policy"
+
+        3)
+        #  "5. User and group and add user to group"
 
 
-case $choice in
-1)
-# Create IAM user
-aws iam create-user --user-name $USERNAME
+        6)
+            #  "6. group and policy and add policy to group"
 
-2)
-
-# Variables
-# check for a bucket name 
-echo "Kindly enter the policie"
-if [ -z "$1" ]; then 
-    echo "you must enter the policie"
-    exit 1
-fi 
-
-
-USERNAME=$1
-POLICY_NAME="IAMFullAccessPolicy"
-POLICY_EXISTS=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].PolicyName" --output text)
+    esac
+done
 
 
 
 
 
-if [ "$POLICY_NAME" == "$POLICY_EXISTS" ]; then 
 
-    echo "Policy '$POLICY_NAME' exists."
 
-else 
-    # Create a custom policy that allows full access to IAM
-    aws iam create-policy --policy-name $POLICY_NAME --policy-document '{
-       "Version": "2012-10-17",
-        "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": "iam:*",
-            "Resource": "*"
-        }       
-                     ]
-       }'
-fi
 
-# Attach the custom policy to the user
-POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='IAMFullAccessPolicy'].Arn" --output text)
-echo   "policy Arn  $POLICY_ARN"
-aws iam attach-user-policy --user-name $USERNAME --policy-arn $POLICY_ARN
 
-# Output confirmation with user and policys attached to it 
-aws iam list-attached-user-policies --user-name $USERNAME
+
+
+
+
+
+
+# USERNAME=$1
+# POLICY_NAME="IAMFullAccessPolicy"
+# POLICY_EXISTS=$(aws iam list-policies --query "Policies[?PolicyName=='$POLICY_NAME'].PolicyName" --output text)
+# if [ "$POLICY_NAME" == "$POLICY_EXISTS" ]; then 
+
+#     echo "Policy '$POLICY_NAME' exists."
+
+# else 
+#     # Create a custom policy that allows full access to IAM
+#     aws iam create-policy --policy-name $POLICY_NAME --policy-document '{
+#        "Version": "2012-10-17",
+#         "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Action": "iam:*",
+#             "Resource": "*"
+#         }       
+#                      ]
+#        }'
+# fi
+
+# # Attach the custom policy to the user
+# POLICY_ARN=$(aws iam list-policies --query "Policies[?PolicyName=='IAMFullAccessPolicy'].Arn" --output text)
+# echo   "policy Arn  $POLICY_ARN"
+# aws iam attach-user-policy --user-name $USERNAME --policy-arn $POLICY_ARN
+# # Output confirmation with user and policys attached to it 
+# aws iam list-attached-user-policies --user-name $USERNAME
