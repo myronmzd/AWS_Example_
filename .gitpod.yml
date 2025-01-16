@@ -33,7 +33,7 @@ tasks:
       aws --version
 
       # Optional: Navigate to your workspace directory
-      cd $THETA_WORKSPACE_ROOT/AWS_Example_
+      cd /workspace/AWS_Example_
 
   - name: Setup
     command: |
