@@ -2,8 +2,7 @@
 
 while true; do
 
-        # Read user choice
-        read -p "Enter your choice (1-9): " choice
+        
 
         echo "Select an option:"
         echo "1. Find users exist and there groups"
@@ -15,6 +14,10 @@ while true; do
         echo "7. User and group and add user to group"
         echo "8. group and policy and add policy to group"
         echo "9. exit"
+        # Read user choice
+        read -p "Enter your choice (1-9): " choice
+
+
 
         case $choice in
         1)
