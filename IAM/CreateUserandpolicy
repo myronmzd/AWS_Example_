@@ -2,7 +2,8 @@
 
 while true; do
 
-        echo  "==Create a user or find policys and give policy to same user "
+        # Read user choice
+        read -p "Enter your choice (1-9): " choice
 
         echo "Select an option:"
         echo "1. Find users exist and there groups"
@@ -35,6 +36,7 @@ while true; do
                 echo "User '$USER' is not part of any groups."
             fi
         done
+        ;;
 
         2)
         # Check if the group exists
@@ -42,7 +44,7 @@ while true; do
         # Check if the user has entered a value
         if [ -z "$GROUP_NAME" ]; then
             echo "User name cannot be empty. Please try again."
-            exit 1
+            continue
         fi
 
         GROUP_EXISTS=$(aws iam list-groups --query "Groups[?GroupName=='$GROUP_NAME'].GroupName" --output text)
@@ -56,6 +58,7 @@ while true; do
         else
             echo "Group '$GROUP_NAME' does not exist."
         fi
+        ;;
 
         3)
         # 3. Create an IAM user
@@ -63,7 +66,7 @@ while true; do
         # Check if the user has entered a value
         if [ -z "$USER_NAME" ]; then
             echo "User name cannot be empty. Please try again."
-            exit 1
+            continue
         fi
 
         # Create the IAM user
@@ -74,6 +77,8 @@ while true; do
         else
             echo "Failed to create IAM user '$USER_NAME'."
         fi
+        ;;
+
 
         4)
         # Prompt user for the IAM username
@@ -82,7 +87,7 @@ while true; do
         # Check if the user entered a name
         if [ -z "$USER_NAME" ]; then
             echo "Error: IAM User name cannot be empty."
-            exit 1
+            continue
         fi
 
         # List access keys for the IAM user
@@ -103,7 +108,7 @@ while true; do
         else
             echo "Access keys found for user $USER_NAME. Please delete the existing keys before creating a new one."
         fi
-
+        ;;
 
         5)
         # "delete access key and disable old access key "
@@ -113,7 +118,7 @@ while true; do
         # Check if the user entered a name
         if [ -z "$USER_NAME" ]; then
             echo "Error: IAM User name cannot be empty."
-            exit 1
+            continue
         fi
 
         # Assuming USER_NAME is already set
@@ -121,7 +126,7 @@ while true; do
 
         if [ -z "$ACCESS_KEYS" ]; then
         echo "No access keys found for user: $USER_NAME"
-        exit 0
+        continue
         fi
 
         echo "Access keys for $USER_NAME: $ACCESS_KEYS"
@@ -136,6 +141,8 @@ while true; do
             echo "Failed to delete access key: $ACCESS_KEY_ID"
         fi
         done
+        ;;
+
 
         6)
         # "4. Find groups policys"
@@ -143,51 +150,79 @@ while true; do
         # Check if the user has entered a value
         if [ -z "$GROUP_NAME" ]; then
             echo "User name cannot be empty. Please try again."
-            exit 1
+            continue
         fi
         
         if ! aws iam list-group-policies --group-name "$GROUP_NAME" > /dev/null 2>&1; then
             echo "Error: Unable to retrieve policies. Please check if the group exists and you have sufficient permissions."
-            exit 1
+            continue
         fi
         aws iam list-group-policies \
          --group-name $GROUP_NAME \
          --output table
-
+        ;;
 
         7)
         #  "5. User and group and add user to group"
         read -p "Enter the name of the Group: " GROUP_NAME
         if [ -z "$GROUP_NAME" ]; then
             echo "Group name cannot be empty. Please try again."
-            exit 1
+            continue
         fi
 
         read -p "Enter the name of the IAM User: " USER_NAME
         if [ -z "$USER_NAME" ]; then
             echo "Error: IAM User name cannot be empty."
-            exit 1
+            continue
         fi
 
-        if ! aws iam list-group --group-name "$GROUP_NAME" > /dev/null 2>&1; then
-            echo "Error: Unable to retrieve Group. Please check if the group exists and you have sufficient permissions."
-            exit 1
+        # Check if the group and user exist
+        if ! aws iam list-group --group-name "$GROUP_NAME" > /dev/null 2>&1 || ! aws iam get-user --user-name "$USER_NAME" > /dev/null 2>&1; then
+            echo "Error: Unable to retrieve Group or User. Please check if the group and user exist and you have sufficient permissions."
+            continue
         fi
 
-        if ! aws iam list-users --group-name "$USER_NAME" > /dev/null 2>&1; then
-            echo "Error: Unable to retrieve User. Please check if the User exists and you have sufficient permissions."
+        # Add the user to the group
+        if aws iam add-user-to-group --user-name "$USER_NAME" --group-name "$GROUP_NAME"; then
+            echo "User '$USER_NAME' successfully added to the group '$GROUP_NAME'."
+        else
+            echo "Error: Failed to add user '$USER_NAME' to the group '$GROUP_NAME'. Please check your permissions and try again."
             exit 1
         fi
-
-
-
-
+        ;;
 
         8)
             #  "6. group and policy and add policy to group"
 
+        read -p "Enter the name of the Group: " GROUP_NAME
+        if [ -z "$GROUP_NAME" ]; then
+            echo "Group name cannot be empty. Please try again."
+            continue
+        fi
+
+        read -p "Enter the name of the policy: " POLICY_NAME
+        if [ -z "$POLICY_NAME" ]; then
+            echo "Error: policy name cannot be empty."
+            continue
+        fi
+        
+
+        # Check if the group and user exist
+        if ! aws iam list-group --group-name "$GROUP_NAME" > /dev/null 2>&1 || ! aws iam get-policy --policy-arn "$POLICY_NAME" > /dev/null 2>&1; then
+            echo "Error: Unable to retrieve Group or Policy. Please check if the group and Policy exist and you have sufficient permissions."
+            exit 1
+        fi
+        ;;
+
         9)
-            # exit
+           # Exit
+        echo "Exiting..."
+        break
+        ;;
+
+        *)
+        echo "Invalid choice, please try again."
+        ;;
 
 
     esac
