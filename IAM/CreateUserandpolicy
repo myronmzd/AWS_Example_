@@ -38,6 +38,13 @@ while true; do
 
         2)
         # Check if the group exists
+        read -p "Enter the name of the Group: " GROUP_NAME
+        # Check if the user has entered a value
+        if [ -z "$GROUP_NAME" ]; then
+            echo "User name cannot be empty. Please try again."
+            exit 1
+        fi
+
         GROUP_EXISTS=$(aws iam list-groups --query "Groups[?GroupName=='$GROUP_NAME'].GroupName" --output text)
 
         if [ "$GROUP_NAME" == "$GROUP_EXISTS" ]; then
@@ -130,10 +137,23 @@ while true; do
         fi
         done
 
-
-
         6)
-        # "4. Find group policy"
+        # "4. Find groups policys"
+        read -p "Enter the name of the Group: " GROUP_NAME
+        # Check if the user has entered a value
+        if [ -z "$GROUP_NAME" ]; then
+            echo "User name cannot be empty. Please try again."
+            exit 1
+        fi
+        
+        if ! aws iam list-group-policies --group-name "$GROUP_NAME" > /dev/null 2>&1; then
+            echo "Error: Unable to retrieve policies. Please check if the group exists and you have sufficient permissions."
+            exit 1
+        fi
+        aws iam list-group-policies \
+         --group-name $GROUP_NAME \
+         --output table
+
 
         7)
         #  "5. User and group and add user to group"
