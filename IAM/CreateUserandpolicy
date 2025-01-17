@@ -1,25 +1,20 @@
 #!/bin/bash
 
 while true; do
+    echo "Select an option:"
+    echo "1. Find users exist and there groups"
+    echo "2. Find group and its users"
+    echo "3. Create a IAM user "
+    echo "4. Create a New access key for NEW IAM user "
+    echo "5. delete access key and disable old access key "
+    echo "6. Find group policy"
+    echo "7. User and group and add user to group"
+    echo "8. group and policy and add policy to group"
+    echo "9. exit"
+    # Read user choice
+    read -p "Enter your choice (1-9): " choice
 
-        
-
-        echo "Select an option:"
-        echo "1. Find users exist and there groups"
-        echo "2. Find group and its users"
-        echo "3. Create a IAM user "
-        echo "4. Create a New access key for NEW IAM user "
-        echo "5. delete access key and disable old access key "
-        echo "6. Find group policy"
-        echo "7. User and group and add user to group"
-        echo "8. group and policy and add policy to group"
-        echo "9. exit"
-        # Read user choice
-        read -p "Enter your choice (1-9): " choice
-
-
-
-        case $choice in
+    case $choice in
         1)
         # List all users
         USERS=$(aws iam list-users --query "Users[].UserName" --output text)
@@ -40,7 +35,6 @@ while true; do
             fi
         done
         ;;
-
         2)
         # Check if the group exists
         read -p "Enter the name of the Group: " GROUP_NAME
@@ -62,7 +56,6 @@ while true; do
             echo "Group '$GROUP_NAME' does not exist."
         fi
         ;;
-
         3)
         # 3. Create an IAM user
         read -p "Enter the name of the User: " USER_NAME
@@ -81,8 +74,6 @@ while true; do
             echo "Failed to create IAM user '$USER_NAME'."
         fi
         ;;
-
-
         4)
         # Prompt user for the IAM username
         read -p "Enter the name of the IAM User: " USER_NAME
@@ -99,7 +90,7 @@ while true; do
         # Check if the user has existing access keys
         if [ -z "$ACCESS_KEYS" ]; then
             echo "No access keys found for user $USER_NAME. Creating a new access key..."
-            NEW_ACCESS_KEY=$(aws iam create-access-key --user-name "$USER_NAME")
+            NEW_ACCESS_KEY=$(aws iam create-access-key --user-name "$USER_NAME" --output table)
 
             # Check if the access key was successfully created ]]]] $? -eq 0  error codes the previous command was 
             if [ $? -eq 0 ]; then
@@ -112,7 +103,6 @@ while true; do
             echo "Access keys found for user $USER_NAME. Please delete the existing keys before creating a new one."
         fi
         ;;
-
         5)
         # "delete access key and disable old access key "
         # Prompt user for the IAM username
@@ -145,8 +135,6 @@ while true; do
         fi
         done
         ;;
-
-
         6)
         # "4. Find groups policys"
         read -p "Enter the name of the Group: " GROUP_NAME
@@ -164,7 +152,6 @@ while true; do
          --group-name $GROUP_NAME \
          --output table
         ;;
-
         7)
         #  "5. User and group and add user to group"
         read -p "Enter the name of the Group: " GROUP_NAME
@@ -193,7 +180,6 @@ while true; do
             exit 1
         fi
         ;;
-
         8)
             #  "6. group and policy and add policy to group"
 
@@ -216,18 +202,14 @@ while true; do
             exit 1
         fi
         ;;
-
         9)
            # Exit
         echo "Exiting..."
         break
         ;;
-
         *)
         echo "Invalid choice, please try again."
         ;;
-
-
     esac
 done
 
