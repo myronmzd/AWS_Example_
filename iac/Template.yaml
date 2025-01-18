@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: A sample CloudFormation Create S3 bucket
+Resources:
+  S3Bucket:
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#aws-resource-s3-bucket--examples--Create_an_S3_bucket
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: mys3-cnf-246810
+      # we don't need put a bucket name it will generate a ramdom name 
