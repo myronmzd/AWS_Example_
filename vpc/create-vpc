@@ -9,6 +9,10 @@ VPC_id=$(aws ec2 create-vpc --cidr-block "172.28.0.0/16" \
     --output text)
 echo "VPC : $VPC_id"
 
+aws ec2 modify-vpc-attribute --vpc-id $VPC_id --enable-dns-hostnames "{\"Value\":true}"
+echo "$(aws ec2 describe-vpc-attribute --vpc-id $VPC_id --attribute enableDnsSupport)"
+
+
 RT_id=$(aws ec2 describe-route-tables \
 --filters "Name=vpc-id,Values=$VPC_id" "Name=association.main,Values=true" \
 --query "RouteTables[0].RouteTableId" \
@@ -34,11 +38,17 @@ aws ec2 attach-internet-gateway --internet-gateway-id $IGW_id --vpc-id $VPC_id
 Subnet_Id=$(aws ec2 create-subnet --cidr-block 172.28.0.0/20 --vpc-id $VPC_id --query Subnet.SubnetId --output text)
 echo "Subnet : $Subnet_Id"
 
+aws ec2 modify-subnet-attribute --subnet-id $Subnet_Id --map-public-ip-on-launch
 
 # explicty associate subnet
 
 aws ec2 associate-route-table \
---route-table-id $RT_id \ 
+--route-table-id $RT_id \
 --subnet-id $Subnet_Id 
 
 # add a route for our RT to out IGW 
+
+aws ec2 create-route \
+--route-table-id $RT_id \
+--destination-cidr-block 0.0.0.0/0 \
+--gateway-id $IGW_id
