@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Delete a IGW 
+
+
+
+# # detach a IGW
+
+aws ec2 detach-internet-gateway --internet-gateway-id $IGW_id --vpc-id $VPC_id
+
+
+# Delete a vpc 
+
+if [ -z  "$1" ];then 
+    echo "Arguremet not provided"
+else
+    export VPC_id=$1
+fi
+
+aws ec2 delete-vpc --vpc-id $VPC_id \
+
+
+
+
+
+# Create a new-subnet
+
+# explicty associate subnet
+
+# add a route for our RT to out IGW 
