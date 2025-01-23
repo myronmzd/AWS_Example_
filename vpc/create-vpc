@@ -10,7 +10,7 @@ VPC_id=$(aws ec2 create-vpc --cidr-block "172.28.0.0/16" \
 echo "VPC : $VPC_id"
 
 aws ec2 modify-vpc-attribute --vpc-id $VPC_id --enable-dns-hostnames "{\"Value\":true}"
-echo "$(aws ec2 describe-vpc-attribute --vpc-id $VPC_id --attribute enableDnsSupport)"
+# echo "$(aws ec2 describe-vpc-attribute --vpc-id $VPC_id --attribute enableDnsSupport)"
 
 
 RT_id=$(aws ec2 describe-route-tables \
@@ -52,3 +52,5 @@ aws ec2 create-route \
 --route-table-id $RT_id \
 --destination-cidr-block 0.0.0.0/0 \
 --gateway-id $IGW_id
+
+echo "./delete_vpc $VPC_id $IGW_id $Subnet_Id $RT_id"

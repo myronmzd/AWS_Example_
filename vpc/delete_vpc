@@ -1,30 +1,67 @@
 #!/usr/bin/env bash
 
-# Delete a IGW 
+# VPC IGW Subnet RT
+
+if [ -z  "$1" ];then 
+    echo "Arguremet not provided VPC_ID"
+else
+    export VPC_id=$1    
+fi
+
+if [ -z  "$2" ];then 
+    echo "Arguremet not provided IGW_id"
+else
+    export IGW_id=$2    
+fi
+
+if [ -z  "$3" ];then 
+    echo "Arguremet not provided Subnet_Id"
+else
+    export Subnet_Id=$3    
+fi
+
+
+if [ -z  "$4" ];then 
+    echo "Arguremet not provided RT_id"
+else
+    export RT_id=$4    
+fi
 
 
 
-# # detach a IGW
+# Delete IGW  
+
+# 1 Detach the IGW
 
 aws ec2 detach-internet-gateway --internet-gateway-id $IGW_id --vpc-id $VPC_id
 
+# 2 Deleting IGW 
 
-# Delete a vpc 
-
-if [ -z  "$1" ];then 
-    echo "Arguremet not provided"
-else
-    export VPC_id=$1
-fi
-
-aws ec2 delete-vpc --vpc-id $VPC_id \
+aws ec2 delete-internet-gateway --internet-gateway-id $IGW_id
 
 
+# Delete Subnet
+
+# disassociate subnet to route table 
+
+# aws ec2 disassociate-route-table --association-id $RT_id
+
+aws ec2 delete-subnet --subnet-id $Subnet_Id
+
+# # Delete Route tables 
+
+# aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_id" --query "RouteTables[].RouteTableId" --output text
+
+# aws ec2 delete-route-table --route-table-id $RT_id
+
+
+# Delete Vpc 
+
+aws ec2 delete-vpc --vpc-id $VPC_id 
 
 
 
-# Create a new-subnet
 
-# explicty associate subnet
 
-# add a route for our RT to out IGW 
+
+
