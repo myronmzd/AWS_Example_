@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+#
+
+aws ec2 create-network-acl --vpc-id $VPC_id
