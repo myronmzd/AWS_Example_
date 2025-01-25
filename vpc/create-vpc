@@ -3,7 +3,7 @@
 # Create a vpc 
 
 VPC_id=$(aws ec2 create-vpc --cidr-block "172.28.0.0/16" \
-    --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=vpc-basic-Ec2-2}]' \
+    --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=vpc-basic-Ec2}]' \
     --region ap-south-1 \
     --query "Vpc.VpcId" \
     --output text)

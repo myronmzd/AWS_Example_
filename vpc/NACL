@@ -1,5 +1,37 @@
 #!/usr/bin/env bash
 
-#
+# Step 1: Get a VPC ID from the name
+Vpc_name="vpc-basic-Ec2"
 
-aws ec2 create-network-acl --vpc-id $VPC_id
+VPC_ID=$(aws ec2 describe-vpcs \
+    --filters "Name=tag:Name,Values=$Vpc_name" \
+    --query "Vpcs[0].VpcId" \
+    --output text)
+
+# Check if the VPC was found
+if [[ -z "$VPC_ID" ]]; then
+    echo "VPC with name $Vpc_name not found."
+    exit 1
+fi
+
+echo "VPC ID: $VPC_ID"
+
+# Step 2: Create a new NACL
+NACL_ID=$(aws ec2 create-network-acl \
+    --vpc-id $VPC_ID \
+    --query "NetworkAcl.NetworkAclId" \
+    --output text)
+
+echo "Created NACL with ID: $NACL_ID"
+
+# Step 3: Add an entry to block inbound traffic from the specific IP address
+aws ec2 create-network-acl-entry \
+  --network-acl-id $NACL_ID \
+  --ingress \
+  --rule-number 90 \
+  --protocol -1 \
+  --port-range From=0,To=65535 \
+  --cidr-block 45.127.45.34/32 \
+  --rule-action deny
+
+echo "Added deny rule to block inbound traffic from 45.127.45.34/32 on port 80"
