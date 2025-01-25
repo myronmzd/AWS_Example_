@@ -34,4 +34,8 @@ aws ec2 create-network-acl-entry \
   --cidr-block 45.127.45.34/32 \
   --rule-action deny
 
-echo "Added deny rule to block inbound traffic from 45.127.45.34/32 on port 80"
+echo "Added deny rule to block inbound traffic from 45.127.45.34/32 on port -1"
+
+##### this if your blocking an IP on a NACL kindly put the associate subnet on it otherwise 
+##### your rule will not work  
+
