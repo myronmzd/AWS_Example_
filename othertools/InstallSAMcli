@@ -7,3 +7,4 @@ unzip samcli.zip -d sam-installation
 sudo ./sam-installation/install
 cd /workspaces/AWS_Example_/
 sam --version
+rm /workspaces/AWS_Example_/samcli.zip
