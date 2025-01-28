@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda function ListBucketsCommand.
+Resources:
+  primer:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: nodejs20.x
+      Role: arn:aws:iam::111122223333:role/lambda-role
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const { S3Client, ListBucketsCommand } = require("@aws-sdk/client-s3");
+          const s3 = new S3Client({ region: "us-east-1" }); // replace "us-east-1" with your AWS Region
+
+          exports.handler = async function(event) {
+            const command = new ListBucketsCommand({});
+            const response = await s3.send(command);
+            return response.Buckets;
+          };
+      Description: List Amazon S3 buckets in us-east-1.
+      TracingConfig:
+        Mode: Active
