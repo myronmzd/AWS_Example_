@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Download Homebrew installation script directly
+curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "install.sh"
+
+# Run the Homebrew installation script
+/bin/bash install.sh
+
+# Verify that Homebrew has been installed
+brew --version
+
+# Clean up by removing the installation script
+rm install.sh
