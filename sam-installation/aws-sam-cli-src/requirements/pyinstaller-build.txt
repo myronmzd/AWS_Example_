@@ -1,3 +1,0 @@
-# Executable binary builder requirements
-setuptools==75.3.0
-pyinstaller==6.11.1

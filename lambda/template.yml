@@ -1,22 +1,32 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: Lambda function ListBucketsCommand.
-Resources:
-  primer:
-    Type: AWS::Lambda::Function
-    Properties:
-      Runtime: nodejs20.x
-      Role: arn:aws:iam::111122223333:role/lambda-role
-      Handler: index.handler
-      Code:
-        ZipFile: |
-          const { S3Client, ListBucketsCommand } = require("@aws-sdk/client-s3");
-          const s3 = new S3Client({ region: "us-east-1" }); // replace "us-east-1" with your AWS Region
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Type: AWS::Serverless::Function
+# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-resource-function-examples
+Properties:
+  Handler: index.handler
+  Runtime: python3.9
+  PackageType : Zip #PackageType: Image
+  CodeUri: s3://bucket-name/key-name
+  InlineCode: |
+    import json
+    import random
 
-          exports.handler = async function(event) {
-            const command = new ListBucketsCommand({});
-            const response = await s3.send(command);
-            return response.Buckets;
-          };
-      Description: List Amazon S3 buckets in us-east-1.
-      TracingConfig:
-        Mode: Active
+    def lambda_handler(event, context):
+      pirate_phrases = [
+          "Ahoy, matey!",
+          "Shiver me timbers!",
+          "Ye be walkin' the plank!",
+          "Arrr, where be me treasure?",
+          "Yo-ho-ho and a bottle o' rum!"
+      ]
+
+      # Choose a random pirate phrase
+      pirate_response = random.choice(pirate_phrases)
+
+      # Build the response
+      response = {
+          "statusCode": 200,
+          "body": json.dumps({"pirate_speak": pirate_response})
+      }
+
+      return response
