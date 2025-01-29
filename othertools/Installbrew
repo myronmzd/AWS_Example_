@@ -7,7 +7,21 @@ curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o
 /bin/bash install.sh
 
 # Verify that Homebrew has been installed
-brew --version
+#brew --version
 
 # Clean up by removing the installation script
-rm install.sh
+#rm install.sh
+echo >> /home/codespace/.bashrc
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/codespace/.bashrc
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+sudo apt-get install build-essential
+brew install gcc
+brew --version
+
+
+
+# lamdba with sam and brew
+
+brew tap aws/tap
+
+brew install aws-sam-cli
