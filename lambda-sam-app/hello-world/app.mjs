@@ -17,7 +17,7 @@ export const lambdaHandler = async (event, context) => {
   const response = {
     statusCode: 200,
     body: JSON.stringify({
-      message: 'hello world from ' + os.hostname(),
+      message: `hello world ${event?.name || ''} from ${os.hostname()}`
     })
   };
 
