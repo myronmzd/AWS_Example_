@@ -8,25 +8,9 @@ Properties:
   PackageType : Zip #PackageType: Image
   CodeUri: s3://bucket-name/key-name
   InlineCode: |
-    import json
-    import random
-
-    def lambda_handler(event, context):
-      pirate_phrases = [
-          "Ahoy, matey!",
-          "Shiver me timbers!",
-          "Ye be walkin' the plank!",
-          "Arrr, where be me treasure?",
-          "Yo-ho-ho and a bottle o' rum!"
-      ]
-
-      # Choose a random pirate phrase
-      pirate_response = random.choice(pirate_phrases)
-
-      # Build the response
-      response = {
-          "statusCode": 200,
-          "body": json.dumps({"pirate_speak": pirate_response})
-      }
-
-      return response
+      import json
+      def lambda_handler(event, context):
+          return {
+              "statusCode": 200,
+              "body": json.dumps({"message": "Hello, World!"})
+          }
