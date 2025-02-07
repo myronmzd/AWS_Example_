@@ -1,0 +1,7 @@
+[main baf2abd] ec2_launched
+ 4 files changed, 44 insertions(+), 37 deletions(-)
+ create mode 100644 Bastion
+ mode change 100644 => 100755 Ec2/cloudformation.yaml
+ create mode 100755 Ec2/keypair.sh
+ create mode 100644 Private
+Changes successfully pushed.
