@@ -7,13 +7,13 @@ Parameters:
     Default: t2.micro
   SubnetID: 
     Type: String
-    Default: subnet-03f75fbc3183b081b
+    Default: subnet-09666efb2737a755b
   ImageID:
     Type: String  
-    Default: ami-09c0d3755326acbf0
+    Default: ami-0b8e60a84f14ce5a3
   myVPC:
     Type: String
-    Default: vpc-08211df302dec65c5
+    Default: vpc-028acf09d4925e022
 
 Resources:
   MyEC2Instance: 
