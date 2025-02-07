@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 aws ec2 describe-images \
+    --region ap-south-1 \
     --owners amazon \
     --filters "Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2" \
               "Name=architecture,Values=x86_64" \
