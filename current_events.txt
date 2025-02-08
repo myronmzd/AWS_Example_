@@ -1,45 +1,41 @@
-+--------------------------------------------------------------------------------+------------------------------------+-----------------------+------------------------------------+
-|  InternetGateway-DELETE_COMPLETE-2025-02-08T18:17:51.615Z                      |  InternetGateway                   |  DELETE_COMPLETE      |  2025-02-08T18:17:51.615000+00:00  |
-|  InternetGateway-DELETE_IN_PROGRESS-2025-02-08T18:17:50.561Z                   |  InternetGateway                   |  DELETE_IN_PROGRESS   |  2025-02-08T18:17:50.561000+00:00  |
-|  VPCGatewayAttachment-DELETE_COMPLETE-2025-02-08T18:17:50.225Z                 |  VPCGatewayAttachment              |  DELETE_COMPLETE      |  2025-02-08T18:17:50.225000+00:00  |
-|  PublicRoute-DELETE_COMPLETE-2025-02-08T18:17:50.158Z                          |  PublicRoute                       |  DELETE_COMPLETE      |  2025-02-08T18:17:50.158000+00:00  |
-|  PublicRoute-DELETE_IN_PROGRESS-2025-02-08T18:17:49.120Z                       |  PublicRoute                       |  DELETE_IN_PROGRESS   |  2025-02-08T18:17:49.120000+00:00  |
-|  VPCGatewayAttachment-DELETE_IN_PROGRESS-2025-02-08T18:17:49.117Z              |  VPCGatewayAttachment              |  DELETE_IN_PROGRESS   |  2025-02-08T18:17:49.117000+00:00  |
-|  SubnetRouteTableAssociationPublic-DELETE_IN_PROGRESS-2025-02-08T18:17:49.109Z |  SubnetRouteTableAssociationPublic |  DELETE_IN_PROGRESS   |  2025-02-08T18:17:49.109000+00:00  |
-|  ffd70490-e648-11ef-bae3-0aae729c3d61                                          |  MyVPCStack                        |  ROLLBACK_IN_PROGRESS |  2025-02-08T18:17:47.601000+00:00  |
-|  SSMInstanceProfile-CREATE_FAILED-2025-02-08T18:17:47.300Z                     |  SSMInstanceProfile                |  CREATE_FAILED        |  2025-02-08T18:17:47.300000+00:00  |
-|  MyInstance-CREATE_FAILED-2025-02-08T18:17:47.023Z                             |  MyInstance                        |  CREATE_FAILED        |  2025-02-08T18:17:47.023000+00:00  |
-|  PublicRoute-CREATE_COMPLETE-2025-02-08T18:16:49.390Z                          |  PublicRoute                       |  CREATE_COMPLETE      |  2025-02-08T18:16:49.390000+00:00  |
-|  PublicRoute-CREATE_IN_PROGRESS-2025-02-08T18:16:48.862Z                       |  PublicRoute                       |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:48.862000+00:00  |
-|  PublicRoute-CREATE_IN_PROGRESS-2025-02-08T18:16:47.848Z                       |  PublicRoute                       |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:47.848000+00:00  |
-|  PublicRouteTable-CREATE_COMPLETE-2025-02-08T18:16:47.499Z                     |  PublicRouteTable                  |  CREATE_COMPLETE      |  2025-02-08T18:16:47.499000+00:00  |
-|  MyInstance-CREATE_IN_PROGRESS-2025-02-08T18:16:45.498Z                        |  MyInstance                        |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:45.498000+00:00  |
-|  InstanceSecurityGroup-CREATE_COMPLETE-2025-02-08T18:16:45.135Z                |  InstanceSecurityGroup             |  CREATE_COMPLETE      |  2025-02-08T18:16:45.135000+00:00  |
-|  SSMInstanceProfile-631c573d-0844-4228-b86f-c54550af860d                       |  SSMInstanceProfile                |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:43.663000+00:00  |
-|  SSMInstanceProfile-CREATE_IN_PROGRESS-2025-02-08T18:16:42.949Z                |  SSMInstanceProfile                |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:42.949000+00:00  |
-|  SubnetRouteTableAssociationPublic-CREATE_COMPLETE-2025-02-08T18:16:41.774Z    |  SubnetRouteTableAssociationPublic |  CREATE_COMPLETE      |  2025-02-08T18:16:41.774000+00:00  |
-|  SSMInstanceProfile-CREATE_IN_PROGRESS-2025-02-08T18:16:41.742Z                |  SSMInstanceProfile                |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:41.742000+00:00  |
-|  SSMRole-CREATE_COMPLETE-2025-02-08T18:16:41.414Z                              |  SSMRole                           |  CREATE_COMPLETE      |  2025-02-08T18:16:41.414000+00:00  |
-|  SubnetRouteTableAssociationPublic-CREATE_IN_PROGRESS-2025-02-08T18:16:41.370Z |  SubnetRouteTableAssociationPublic |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:41.370000+00:00  |
-|  SubnetRouteTableAssociationPublic-CREATE_IN_PROGRESS-2025-02-08T18:16:40.372Z |  SubnetRouteTableAssociationPublic |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:40.372000+00:00  |
-|  PublicSubnet-CREATE_COMPLETE-2025-02-08T18:16:40.007Z                         |  PublicSubnet                      |  CREATE_COMPLETE      |  2025-02-08T18:16:40.007000+00:00  |
-|  InternetGateway-CREATE_COMPLETE-2025-02-08T18:16:39.642Z                      |  InternetGateway                   |  CREATE_COMPLETE      |  2025-02-08T18:16:39.642000+00:00  |
-|  VPCGatewayAttachment-CREATE_COMPLETE-2025-02-08T18:16:38.401Z                 |  VPCGatewayAttachment              |  CREATE_COMPLETE      |  2025-02-08T18:16:38.401000+00:00  |
-|  InstanceSecurityGroup-CREATE_IN_PROGRESS-2025-02-08T18:16:38.161Z             |  InstanceSecurityGroup             |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:38.161000+00:00  |
-|  PublicRouteTable-702747c4-e28c-40c4-aedd-9429c08c4efe                         |  PublicRouteTable                  |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:37.320000+00:00  |
-|  PublicSubnet-CREATE_IN_PROGRESS-2025-02-08T18:16:36.907Z                      |  PublicSubnet                      |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:36.907000+00:00  |
-|  PublicRouteTable-CREATE_IN_PROGRESS-2025-02-08T18:16:36.833Z                  |  PublicRouteTable                  |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:36.833000+00:00  |
-|  VPCGatewayAttachment-CREATE_IN_PROGRESS-2025-02-08T18:16:36.703Z              |  VPCGatewayAttachment              |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:36.703000+00:00  |
-|  PublicSubnet-CREATE_IN_PROGRESS-2025-02-08T18:16:35.994Z                      |  PublicSubnet                      |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:35.994000+00:00  |
-|  InstanceSecurityGroup-CREATE_IN_PROGRESS-2025-02-08T18:16:35.990Z             |  InstanceSecurityGroup             |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:35.990000+00:00  |
-|  VPCGatewayAttachment-CREATE_IN_PROGRESS-2025-02-08T18:16:35.964Z              |  VPCGatewayAttachment              |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:35.964000+00:00  |
-|  PublicRouteTable-CREATE_IN_PROGRESS-2025-02-08T18:16:35.961Z                  |  PublicRouteTable                  |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:35.961000+00:00  |
-|  MyVPC-CREATE_COMPLETE-2025-02-08T18:16:35.630Z                                |  MyVPC                             |  CREATE_COMPLETE      |  2025-02-08T18:16:35.630000+00:00  |
-|  InternetGateway-0671e93c-c655-4b30-8a8f-faebcfaa9baa                          |  InternetGateway                   |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:24.473000+00:00  |
-|  SSMRole-CREATE_IN_PROGRESS-2025-02-08T18:16:24.315Z                           |  SSMRole                           |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:24.315000+00:00  |
-|  MyVPC-CREATE_IN_PROGRESS-2025-02-08T18:16:24.193Z                             |  MyVPC                             |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:24.193000+00:00  |
-|  InternetGateway-CREATE_IN_PROGRESS-2025-02-08T18:16:23.989Z                   |  InternetGateway                   |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:23.989000+00:00  |
-|  SSMRole-CREATE_IN_PROGRESS-2025-02-08T18:16:23.135Z                           |  SSMRole                           |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:23.135000+00:00  |
-|  InternetGateway-CREATE_IN_PROGRESS-2025-02-08T18:16:23.134Z                   |  InternetGateway                   |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:23.134000+00:00  |
-|  MyVPC-CREATE_IN_PROGRESS-2025-02-08T18:16:23.120Z                             |  MyVPC                             |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:23.120000+00:00  |
-|  cc4ce540-e648-11ef-a416-0648fced6461                                          |  MyVPCStack                        |  CREATE_IN_PROGRESS   |  2025-02-08T18:16:21.164000+00:00  |
++----------------------------------+---------------------+----------------------------------------+-------------------------------------+----------------------------------------+
+|  2025-02-08T18:40:49.955000+00:00|  CREATE_FAILED      |  AWS::IAM::InstanceProfile             |  SSMInstanceProfile                 |  Resource creation cancelled           |
+|  2025-02-08T18:40:49.503000+00:00|  DELETE_IN_PROGRESS |  AWS::CloudFormation::Stack            |  MyVPCStack                         |  User Initiated                        |
+|  2025-02-08T18:40:22.059000+00:00|  CREATE_COMPLETE    |  AWS::EC2::Instance                    |  MyInstance                         |  None                                  |
+|  2025-02-08T18:40:21.486000+00:00|  CREATE_IN_PROGRESS |  AWS::CloudFormation::Stack            |  MyVPCStack                         |  Eventual consistency check initiated  |
+|  2025-02-08T18:40:21.438000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::Instance                    |  MyInstance                         |  Eventual consistency check initiated  |
+|  2025-02-08T18:40:10.484000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::Instance                    |  MyInstance                         |  Resource creation Initiated           |
+|  2025-02-08T18:39:12.104000+00:00|  CREATE_COMPLETE    |  AWS::EC2::Route                       |  PublicRoute                        |  None                                  |
+|  2025-02-08T18:39:11.614000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::Route                       |  PublicRoute                        |  Resource creation Initiated           |
+|  2025-02-08T18:39:10.638000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::Route                       |  PublicRoute                        |  None                                  |
+|  2025-02-08T18:39:10.286000+00:00|  CREATE_COMPLETE    |  AWS::EC2::RouteTable                  |  PublicRouteTable                   |  None                                  |
+|  2025-02-08T18:39:08.518000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::Instance                    |  MyInstance                         |  None                                  |
+|  2025-02-08T18:39:08.174000+00:00|  CREATE_COMPLETE    |  AWS::EC2::SecurityGroup               |  InstanceSecurityGroup              |  None                                  |
+|  2025-02-08T18:39:06.360000+00:00|  CREATE_IN_PROGRESS |  AWS::IAM::InstanceProfile             |  SSMInstanceProfile                 |  Eventual consistency check initiated  |
+|  2025-02-08T18:39:05.688000+00:00|  CREATE_IN_PROGRESS |  AWS::IAM::InstanceProfile             |  SSMInstanceProfile                 |  Resource creation Initiated           |
+|  2025-02-08T18:39:04.628000+00:00|  CREATE_COMPLETE    |  AWS::EC2::SubnetRouteTableAssociation |  SubnetRouteTableAssociationPublic  |  None                                  |
+|  2025-02-08T18:39:04.566000+00:00|  CREATE_IN_PROGRESS |  AWS::IAM::InstanceProfile             |  SSMInstanceProfile                 |  None                                  |
+|  2025-02-08T18:39:04.230000+00:00|  CREATE_COMPLETE    |  AWS::IAM::Role                        |  SSMRole                            |  None                                  |
+|  2025-02-08T18:39:04.155000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::SubnetRouteTableAssociation |  SubnetRouteTableAssociationPublic  |  Resource creation Initiated           |
+|  2025-02-08T18:39:03.057000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::SubnetRouteTableAssociation |  SubnetRouteTableAssociationPublic  |  None                                  |
+|  2025-02-08T18:39:02.755000+00:00|  CREATE_COMPLETE    |  AWS::EC2::Subnet                      |  PublicSubnet                       |  None                                  |
+|  2025-02-08T18:39:02.484000+00:00|  CREATE_COMPLETE    |  AWS::EC2::InternetGateway             |  InternetGateway                    |  None                                  |
+|  2025-02-08T18:39:01.458000+00:00|  CREATE_COMPLETE    |  AWS::EC2::VPCGatewayAttachment        |  VPCGatewayAttachment               |  None                                  |
+|  2025-02-08T18:39:00.975000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::SecurityGroup               |  InstanceSecurityGroup              |  Resource creation Initiated           |
+|  2025-02-08T18:39:00.090000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::RouteTable                  |  PublicRouteTable                   |  Eventual consistency check initiated  |
+|  2025-02-08T18:38:59.624000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::Subnet                      |  PublicSubnet                       |  Resource creation Initiated           |
+|  2025-02-08T18:38:59.624000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::RouteTable                  |  PublicRouteTable                   |  Resource creation Initiated           |
+|  2025-02-08T18:38:59.607000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::VPCGatewayAttachment        |  VPCGatewayAttachment               |  Resource creation Initiated           |
+|  2025-02-08T18:38:58.849000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::SecurityGroup               |  InstanceSecurityGroup              |  None                                  |
+|  2025-02-08T18:38:58.820000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::VPCGatewayAttachment        |  VPCGatewayAttachment               |  None                                  |
+|  2025-02-08T18:38:58.808000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::RouteTable                  |  PublicRouteTable                   |  None                                  |
+|  2025-02-08T18:38:58.801000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::Subnet                      |  PublicSubnet                       |  None                                  |
+|  2025-02-08T18:38:58.462000+00:00|  CREATE_COMPLETE    |  AWS::EC2::VPC                         |  MyVPC                              |  None                                  |
+|  2025-02-08T18:38:47.338000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::InternetGateway             |  InternetGateway                    |  Eventual consistency check initiated  |
+|  2025-02-08T18:38:47.242000+00:00|  CREATE_IN_PROGRESS |  AWS::IAM::Role                        |  SSMRole                            |  Resource creation Initiated           |
+|  2025-02-08T18:38:46.997000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::VPC                         |  MyVPC                              |  Resource creation Initiated           |
+|  2025-02-08T18:38:46.812000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::InternetGateway             |  InternetGateway                    |  Resource creation Initiated           |
+|  2025-02-08T18:38:45.973000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::InternetGateway             |  InternetGateway                    |  None                                  |
+|  2025-02-08T18:38:45.963000+00:00|  CREATE_IN_PROGRESS |  AWS::IAM::Role                        |  SSMRole                            |  None                                  |
+|  2025-02-08T18:38:45.935000+00:00|  CREATE_IN_PROGRESS |  AWS::EC2::VPC                         |  MyVPC                              |  None                                  |
+|  2025-02-08T18:38:43.850000+00:00|  CREATE_IN_PROGRESS |  AWS::CloudFormation::Stack            |  MyVPCStack                         |  User Initiated                        |

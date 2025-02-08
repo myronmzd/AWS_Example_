@@ -144,52 +144,58 @@ aws cloudformation create-stack \
   --capabilities CAPABILITY_IAM \
   --template-body file://template.yaml
 
-echo "Monitoring CloudFormation events for stack: MyVPCStack"
 
-LAST_EVENT_ID=""
+
+STACK_NAME="MyVPCStack"
+
+# Color definitions
+GRAY='\033[1;30m'
+GREEN='\033[0;32m'
+RESET='\033[0m'
+
+echo "Monitoring CloudFormation stack status: $STACK_NAME"
 
 while true; do
-  # Fetch stack events sorted by time descending
-  aws cloudformation describe-stack-events \
-    --stack-name MyVPCStack \
-    --query "StackEvents[*].[Timestamp, ResourceStatus, ResourceType, LogicalResourceId, ResourceStatusReason]" \
-    --output table | tail -n +3 | head -n -1 > current_events.txt
+  # Clear space for better readability
+  echo -e "\n=============================="
+  echo "Checking resource status at $(date)"
+  echo "=============================="
 
-  # Check for new events
-  NEW_EVENT=$(head -1 current_events.txt | awk '{print $1}')
-  if [[ "$NEW_EVENT" != "$LAST_EVENT_ID" ]]; then
-    echo "Latest Events:"
-    cat current_events.txt | while read -r event; do
-      resource=$(echo "$event" | awk '{print $4}')
-      status=$(echo "$event" | awk '{print $2}')
-      
-      case "$status" in
-        "CREATE_COMPLETE")
-          echo "$resource successfully started up ✅"
-          ;;
-        "CREATE_FAILED")
-          echo "$resource failed to start ❌"
-          ;;
-        "ROLLBACK_IN_PROGRESS"|"ROLLBACK_COMPLETE")
-          echo "$resource is in rollback state ⚠️"
-          ;;
-        *)
-          echo "$resource status: $status"
-          ;;
-      esac
-    done
-    LAST_EVENT_ID="$NEW_EVENT"
-  fi
+  # Fetch and display the latest resource statuses
+  aws cloudformation describe-stack-resources \
+    --stack-name "$STACK_NAME" \
+    --query "StackResources[*].[LogicalResourceId, ResourceType, ResourceStatus]" \
+    --output text | while read -r resource_id resource_type resource_status; do
+    
+    # Apply color based on resource status
+    if [[ "$resource_status" == "CREATE_IN_PROGRESS" ]]; then
+      echo -e "${GRAY}$resource_id ($resource_type) -- $resource_status${RESET}"
+    elif [[ "$resource_status" == "CREATE_COMPLETE" ]]; then
+      echo -e "${GREEN}$resource_id ($resource_type) -- $resource_status${RESET}"
+    else
+      echo "$resource_id ($resource_type) -- $resource_status"
+    fi
+  done
 
-  # Check stack status
-  STATUS=$(aws cloudformation describe-stacks \
-    --stack-name MyVPCStack \
+  # Check final stack status
+  FINAL_STATUS=$(aws cloudformation describe-stacks \
+    --stack-name "$STACK_NAME" \
     --query "Stacks[0].StackStatus" --output text)
 
-  if [[ "$STATUS" == "CREATE_COMPLETE" || "$STATUS" == "CREATE_FAILED" || "$STATUS" == *"ROLLBACK"* ]]; then
-    echo "Final Stack Status: $STATUS"
+  if [[ "$FINAL_STATUS" == "CREATE_COMPLETE" ]]; then
+    echo -e "\n=============================="
+    echo -e "${GREEN}Final Stack Status: $FINAL_STATUS"
+    echo "All resources are started.${RESET}"
+    echo "=============================="
+    break
+  elif [[ "$FINAL_STATUS" == *"FAILED"* || "$FINAL_STATUS" == *"ROLLBACK"* ]]; then
+    echo -e "\n=============================="
+    echo "Final Stack Status: $FINAL_STATUS"
+    echo "Stack creation failed or rolled back."
+    echo "=============================="
     break
   fi
 
+  # Sleep for 10 seconds
   sleep 10
 done
