@@ -1,18 +1,3 @@
-#!/usr/bin/env bash
-
-Ec2_aim=$(aws ec2 describe-images \
-    --region ap-south-1 \
-    --owners amazon \
-    --filters "Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2" \
-              "Name=architecture,Values=x86_64" \
-              "Name=virtualization-type,Values=hvm" \
-    --query "Images | sort_by(@, &CreationDate)[-1].{ImageId:ImageId}" \
-    --output text)
-echo "$Ec2_aim"
-
-
-
-cat > template.yaml <<EOF
 AWSTemplateFormatVersion: 2010-09-09
 Description: A CloudFormation template to set up VPC, Subnet, NAT Gateway, and an EC2 instance.
 
@@ -22,7 +7,7 @@ Parameters:
     Default: t2.micro
   Ec2Ami:
     Type: String
-    Default: $Ec2_aim
+    Default: ami-0b8e60a84f14ce5a3
   AvailabilityZone:
     Type: String
     Default: ap-south-1a
@@ -135,61 +120,3 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-EOF
-
-aws cloudformation create-stack \
-  --region ap-south-1 \
-  --stack-name MyVPCStack \
-  --output text \
-  --capabilities CAPABILITY_IAM \
-  --template-body file://template.yaml
-
-echo "Monitoring CloudFormation events for stack: MyVPCStack"
-
-LAST_EVENT_ID=""
-
-while true; do
-  # Fetch stack events sorted by time descending
-  aws cloudformation describe-stack-events \
-    --stack-name MyVPCStack \
-    --query "StackEvents[*].[Timestamp, ResourceStatus, ResourceType, LogicalResourceId, ResourceStatusReason]" \
-    --output table | tail -n +3 | head -n -1 > current_events.txt
-
-  # Check for new events
-  NEW_EVENT=$(head -1 current_events.txt | awk '{print $1}')
-  if [[ "$NEW_EVENT" != "$LAST_EVENT_ID" ]]; then
-    echo "Latest Events:"
-    cat current_events.txt | while read -r event; do
-      resource=$(echo "$event" | awk '{print $4}')
-      status=$(echo "$event" | awk '{print $2}')
-      
-      case "$status" in
-        "CREATE_COMPLETE")
-          echo "$resource successfully started up ✅"
-          ;;
-        "CREATE_FAILED")
-          echo "$resource failed to start ❌"
-          ;;
-        "ROLLBACK_IN_PROGRESS"|"ROLLBACK_COMPLETE")
-          echo "$resource is in rollback state ⚠️"
-          ;;
-        *)
-          echo "$resource status: $status"
-          ;;
-      esac
-    done
-    LAST_EVENT_ID="$NEW_EVENT"
-  fi
-
-  # Check stack status
-  STATUS=$(aws cloudformation describe-stacks \
-    --stack-name MyVPCStack \
-    --query "Stacks[0].StackStatus" --output text)
-
-  if [[ "$STATUS" == "CREATE_COMPLETE" || "$STATUS" == "CREATE_FAILED" || "$STATUS" == *"ROLLBACK"* ]]; then
-    echo "Final Stack Status: $STATUS"
-    break
-  fi
-
-  sleep 10
-done
