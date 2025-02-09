@@ -197,5 +197,5 @@ while true; do
   fi
 
   # Sleep for 10 seconds
-  sleep 10
+  sleep 8
 done
