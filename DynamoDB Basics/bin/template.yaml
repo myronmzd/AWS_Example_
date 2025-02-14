@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableClass: STANDARD     
+      # STANDARD and STANDARD_INFREQUENT_ACCESS
+      TableName: "myTableName"
+      BillingMode : PROVISIONED
+      # If you set BillingMode as PROVISIONED, you must specify this property. If you set BillingMode as PAY_PER_REQUEST, you cannot specify this property.
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: "Album"  # PK praimary key 
+          KeyType: "HASH"
+        - AttributeName: "Artist" # SK sort key
+          KeyType: "RANGE"    # Sort Key (Optional)
+      AttributeDefinitions:
+        - AttributeName: "Album"
+          AttributeType: "S"    # string 
+        - AttributeName: "Artist"
+          AttributeType: "S"
+        # "S" → String (e.g., "Name": "John").
+        # "N" → Number (e.g., "Age": 30).
+        # "B" → Binary (e.g., "File": "101010" in Base64).
+      DeletionProtectionEnabled: false  # find error
