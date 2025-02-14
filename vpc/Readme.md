@@ -33,10 +33,3 @@ Before deploying any VPC configurations, ensure you have the following:
   - [Terraform](https://www.terraform.io/downloads.html) – If using Terraform for deployments.
   - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) – If using AWS CDK for defining infrastructure.
 
-## Deployment Instructions
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/myronmzd/AWS_Example_.git
-cd AWS_Example_/vpc
-```
