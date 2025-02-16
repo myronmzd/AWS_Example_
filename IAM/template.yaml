@@ -7,5 +7,5 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/ReadOnlyAccess"
       LoginProfile:
-        Password: !Sub "${AWS::StackName}-My@246810!"
+        # Password: !Sub "${AWS::StackName}-My@246810!"
         # PasswordResetRequired: true
