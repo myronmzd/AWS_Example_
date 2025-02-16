@@ -1,8 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Resources:
   MyUser:
-    Type: 'AWS::IAM::User'
+    Type: "AWS::IAM::User"
     Properties:
-      UserName: "String"
+      UserName: "noel1"
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
+        - "arn:aws:iam::aws:policy/ReadOnlyAccess"
+      LoginProfile:
+        Password: !Sub "${AWS::StackName}-My@246810!"
+        # PasswordResetRequired: true
