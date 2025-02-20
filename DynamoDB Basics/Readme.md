@@ -1,4 +1,21 @@
+# DynamoDB Basics
 
+This folder contains resources and scripts for working with Amazon DynamoDB.
+
+## Contents
+
+- **bin/template.yaml**: CloudFormation template to create a DynamoDB table.
+
+## Features
+
+- **DynamoDB Table**: Create a DynamoDB table with specified attributes and provisioned throughput.
+
+## Usage
+
+To deploy the DynamoDB table using CloudFormation, run the following command:
+
+```sh
+aws cloudformation deploy --template-file bin/template.yaml --stack-name my-dynamodb-stack
 ### vpc/README.md
 ```md
 # VPC
