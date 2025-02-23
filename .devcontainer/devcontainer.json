@@ -10,7 +10,7 @@
 		"version": "22"
 	  }
 	},
-	"postCreateCommand": "npm install -g aws-cdk",
+	"postCreateCommand": "npm install -g aws-cdk && npm install boto3",
 	"customizations": {
 	  "vscode": {
 		"extensions": [
