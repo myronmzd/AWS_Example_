@@ -10,14 +10,14 @@ if [ -z "$1" ]; then
 fi 
 
 BUCKET_NAME=$1
-AWS_PROFILE_NAME=${2:-my-profile}  # If no profile is provided, use "default"
+#AWS_PROFILE_NAME=${2:-default}  # If no profile is provided, use "default"
 
-echo "🛠️ Using AWS profile: $AWS_PROFILE_NAME"
+#echo "🛠️ Using AWS profile: $AWS_PROFILE_NAME"
 
 # Create S3 bucket using the specified profile
 aws s3api create-bucket --bucket "$BUCKET_NAME" \
-  --create-bucket-configuration LocationConstraint=ap-south-1 \
-  --profile "$AWS_PROFILE_NAME"
+  --create-bucket-configuration LocationConstraint=ap-south-1 
+#  --profile "$AWS_PROFILE_NAME"
 
 # Check if the bucket was created successfully
 if [ $? -eq 0 ]; then
