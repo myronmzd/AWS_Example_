@@ -2,37 +2,67 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-resource "aws_vpc" "main" {
+# VPCs
+resource "aws_vpc" "Home_vpc" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_support = true
+  enable_dns_hostnames = true
+  tags = { Name = "Home_vpc" }
 }
 
-resource "aws_subnet" "public" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = true
+resource "aws_vpc" "Cart_vpc" {
+  cidr_block = "10.1.0.0/16"
+  enable_dns_support = true
+  enable_dns_hostnames = true
+  tags = { Name = "Cart_vpc" }
 }
 
-resource "aws_subnet" "private" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
+# Subnets (Private)
+resource "aws_subnet" "Home_subnet" {
+  vpc_id     = aws_vpc.Home_vpc.id
+  cidr_block = "10.0.1.0/24"
+  tags = { Name = "Home_subnet" }
 }
 
-resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "Cart_subnet" {
+  vpc_id     = aws_vpc.Cart_vpc.id
+  cidr_block = "10.1.1.0/24"
+  tags = { Name = "Cart_subnet" }
 }
 
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
+# Internet Gateway (For Outbound Access)
+resource "aws_internet_gateway" "Home_igw" {
+  vpc_id = aws_vpc.Home_vpc.id
+  tags = { Name = "Home_IGW" }
 }
 
-resource "aws_route" "internet_access" {
-  route_table_id         = aws_route_table.public.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.gw.id
+resource "aws_internet_gateway" "Cart_igw" {
+  vpc_id = aws_vpc.Cart_vpc.id
+  tags = { Name = "Cart_IGW" }
 }
 
-resource "aws_security_group" "elb_sg" {
-  vpc_id = aws_vpc.main.id
+# Route Table for Internet Access
+resource "aws_route_table" "Home_route" {
+  vpc_id = aws_vpc.Home_vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.Home_igw.id
+  }
+  tags = { Name = "Home_Route" }
+}
+
+resource "aws_route_table" "Cart_route" {
+  vpc_id = aws_vpc.Cart_vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.Cart_igw.id
+  }
+  tags = { Name = "Cart_Route" }
+}
+
+# Security Group for EC2
+resource "aws_security_group" "ec2_sg" {
+  vpc_id = aws_vpc.Home_vpc.id
   
   ingress {
     from_port   = 80
@@ -42,78 +72,86 @@ resource "aws_security_group" "elb_sg" {
   }
   
   ingress {
-    from_port   = 443
-    to_port     = 443
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_security_group" "ssh_sg" {
-  vpc_id = aws_vpc.main.id
-  
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["45.127.45.86/32"]
-  }
-}
-
-resource "aws_lb" "app_lb" {
-  name               = "app-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.elb_sg.id]
-  subnets           = [aws_subnet.public.id]
-}
-
-resource "aws_lb_target_group" "tg" {
-  name     = "app-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
-}
-
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.app_lb.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tg.arn
-  }
-}
-
-resource "aws_launch_template" "ec2_template" {
-  name          = "ec2-template"
-  image_id      = "ami-12345678"
+# Launch Template for Auto Scaling
+resource "aws_launch_template" "Home_template" {
+  name_prefix   = "home-template"
+  image_id      = "ami-12345678" # Replace with your AMI
   instance_type = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 }
 
-resource "aws_autoscaling_group" "asg" {
-  vpc_zone_identifier  = [aws_subnet.private.id]
-  desired_capacity     = 2
-  min_size            = 1
-  max_size            = 3
+resource "aws_launch_template" "Cart_template" {
+  name_prefix   = "cart-template"
+  image_id      = "ami-12345678" # Replace with your AMI
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+}
+
+# Auto Scaling Groups
+resource "aws_autoscaling_group" "Home_asg" {
+  vpc_zone_identifier = [aws_subnet.Home_subnet.id]
+  desired_capacity   = 1
+  min_size          = 1
+  max_size          = 2
   launch_template {
-    id      = aws_launch_template.ec2_template.id
+    id      = aws_launch_template.Home_template.id
     version = "$Latest"
   }
 }
 
-resource "aws_route53_zone" "main" {
-  name = "myronmzd.com"
+resource "aws_autoscaling_group" "Cart_asg" {
+  vpc_zone_identifier = [aws_subnet.Cart_subnet.id]
+  desired_capacity   = 1
+  min_size          = 1
+  max_size          = 2
+  launch_template {
+    id      = aws_launch_template.Cart_template.id
+    version = "$Latest"
+  }
 }
 
-resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "www.myronmzd.com"
-  type    = "A"
-  alias {
-    name                   = aws_lb.app_lb.dns_name
-    zone_id                = aws_lb.app_lb.zone_id
-    evaluate_target_health = true
+# Load Balancer
+resource "aws_lb" "App_ALB" {
+  name               = "app-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.ec2_sg.id]
+  subnets           = [aws_subnet.Home_subnet.id, aws_subnet.Cart_subnet.id]
+}
+
+# Load Balancer Listener
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.App_ALB.arn
+  port             = "80"
+  protocol         = "HTTP"
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.App_TG.arn
   }
+}
+
+# Target Group
+resource "aws_lb_target_group" "App_TG" {
+  name     = "app-target-group"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.Home_vpc.id
+}
+
+# Target Group Attachments
+resource "aws_lb_target_group_attachment" "Home_attach" {
+  target_group_arn = aws_lb_target_group.App_TG.arn
+  target_id        = aws_autoscaling_group.Home_asg.id
+}
+
+resource "aws_lb_target_group_attachment" "Cart_attach" {
+  target_group_arn = aws_lb_target_group.App_TG.arn
+  target_id        = aws_autoscaling_group.Cart_asg.id
 }
