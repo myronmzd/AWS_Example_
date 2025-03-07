@@ -1,4 +1,4 @@
- ELB\terraform\.terraform.lock.hcl
- ELB\terraform\.terraform/
+ELB\terraform\.terraform.lock.hcl
+ELB\terraform\.terraform\
 ELB\terraform\terraform.tfstate
 ELB\terraform\terraform.tfstate.backup
