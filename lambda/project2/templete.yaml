@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  S3ProcessingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ProcessS3Files
+      Runtime: python3.8
+      Handler: app.lambda_handler
+      CodeUri: .
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref S3Bucket
+      Events:
+        S3UploadEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref S3Bucket
+            Events: s3:ObjectCreated:*
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+
+Outputs:
+  FunctionArn:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt S3ProcessingFunction.Arn
