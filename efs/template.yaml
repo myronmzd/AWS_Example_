@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: A CloudFormation template to set up VPC, Subnet, NAT Gateway, and an EC2 instance.
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+  Ec2Ami:
+    Type: String
+    Default: 
+  AvailabilityZone:
+    Type: String
+    Default: ap-south-1a
+    AllowedValues: [ap-south-1a, ap-south-1b]
+  MyIP:
+    Type: String
+    Description: "Your public IP address"
+
+Resources:
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 192.168.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: MyProductionVPC
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref InternetGateway
+  
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 192.168.1.0/24
+      AvailabilityZone: !Ref AvailabilityZone
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet
+
+  PublicRouteTable:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        VpcId: !Ref MyVPC
+
+  PublicRoute:
+      Type: AWS::EC2::Route
+      Properties:
+        RouteTableId: !Ref PublicRouteTable
+        DestinationCidrBlock: 0.0.0.0/0
+        GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociationPublic:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref PublicRouteTable
+        SubnetId: !Ref PublicSubnet
+    
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH access only
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyIP
+        - IpProtocol: -1  # Allow all inbound traffic
+          FromPort: -1    # No specific port (applies to all protocols)
+          ToPort: -1      # No specific port (applies to all protocols)
+          CidrIp: 0.0.0.0/0  # Allow from any IP address
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref Ec2Ami
+      InstanceType: !Ref InstanceType
+      SubnetId: !Ref PublicSubnet
+      IamInstanceProfile: !Ref SSMInstanceProfile
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+      KeyName: MyKeyPair
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y amazon-ssm-agent
+          systemctl enable amazon-ssm-agent
+          systemctl start amazon-ssm-agent
+          systemctl enable sshd
+          systemctl start sshd
+          echo "<h1>Welcome to Myron Server on EC2</h1>" > /var/www/html/index.html
+
+  SSMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref SSMRole
+
+  SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+    FileSystemResource:
+        Type: 'AWS::EFS::FileSystem'
+        Properties:
+        BackupPolicy:
+            Status: DISABLE
+        PerformanceMode: generalPurpose
+        Encrypted: true
+        FileSystemTags:
+            - Key: Name
+            Value: TestFileSystem
+
+    MountTarget: 
+        Type: AWS::EFS::MountTarget
+        Properties: 
+            FileSystemId: 
+            Ref: "FileSystemResource"
+            SubnetId: !Ref PublicSubnet
+            SecurityGroups: !Ref InstanceSecurityGroup
+
