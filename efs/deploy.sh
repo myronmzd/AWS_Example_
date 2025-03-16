@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Get latest Amazon Linux 2 AMI
 Ec2_aim=$(aws ec2 describe-images \
     --region ap-south-1 \
     --owners amazon \
@@ -10,6 +11,13 @@ Ec2_aim=$(aws ec2 describe-images \
     --output text)
 echo "$Ec2_aim"
 
+# Check if AMI retrieval was successful
+if [ -z "$Ec2_aim" ]; then
+    echo "Error: No AMI found. Exiting."
+    exit 1
+fi
+
+echo "Using AMI: $Ec2_aim"
 
 MY_IP=$(curl -s https://checkip.amazonaws.com)/32
 aws ssm put-parameter --name "MyPublicIP" --value "$MY_IP" --type String --overwrite
@@ -32,18 +40,20 @@ Parameters:
     AllowedValues: [ap-south-1a, ap-south-1b]
   MyIP:
     Type: String
+    Default: ${MY_IP}
     Description: "Your public IP address"
 
 Resources:
   MyVPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 192.168.0.0/16
+      CidrBlock: 10.0.0.0/16
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
         - Key: Name
           Value: MyProductionVPC
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
 
@@ -57,7 +67,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: 192.168.1.0/24
+      CidrBlock: 10.0.1.0/24
       AvailabilityZone: !Ref AvailabilityZone
       MapPublicIpOnLaunch: true
       Tags:
@@ -65,22 +75,22 @@ Resources:
           Value: PublicSubnet
 
   PublicRouteTable:
-      Type: AWS::EC2::RouteTable
-      Properties:
-        VpcId: !Ref MyVPC
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
 
   PublicRoute:
-      Type: AWS::EC2::Route
-      Properties:
-        RouteTableId: !Ref PublicRouteTable
-        DestinationCidrBlock: 0.0.0.0/0
-        GatewayId: !Ref InternetGateway
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
 
   SubnetRouteTableAssociationPublic:
-      Type: AWS::EC2::SubnetRouteTableAssociation
-      Properties:
-        RouteTableId: !Ref PublicRouteTable
-        SubnetId: !Ref PublicSubnet
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet
     
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -142,35 +152,33 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
 
-    FileSystemResource:
-        Type: 'AWS::EFS::FileSystem'
-        Properties:
-        BackupPolicy:
-            Status: DISABLE
-        PerformanceMode: generalPurpose
-        Encrypted: true
-        FileSystemTags:
-            - Key: Name
-            Value: TestFileSystem
+  FileSystemResource:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      BackupPolicy:
+        Status: DISABLED
+      PerformanceMode: generalPurpose
+      Encrypted: true
+      FileSystemTags:
+        - Key: Name
+          Value: TestFileSystem
 
-    MountTarget: 
-        Type: AWS::EFS::MountTarget
-        Properties: 
-            FileSystemId: 
-            Ref: "FileSystemResource"
-            SubnetId: !Ref PublicSubnet
-            SecurityGroups: !Ref InstanceSecurityGroup
-
+  MountTarget: 
+      Type: AWS::EFS::MountTarget
+      Properties: 
+          FileSystemId: !Ref FileSystemResource
+          SubnetId: !Ref PublicSubnet
+          SecurityGroups: 
+            - !Ref InstanceSecurityGroup 
 EOF
 
+# Deploy CloudFormation stack
 aws cloudformation create-stack \
   --region ap-south-1 \
-  --stack-name MyVPCStack \
+  --stack-name MyEFSstack \
   --output text \
   --capabilities CAPABILITY_IAM \
   --template-body file://template.yaml
-
-
 
 STACK_NAME="MyVPCStack"
 
@@ -182,18 +190,15 @@ RESET='\033[0m'
 echo "Monitoring CloudFormation stack status: $STACK_NAME"
 
 while true; do
-  # Clear space for better readability
   echo -e "\n=============================="
   echo "Checking resource status at $(date)"
   echo "=============================="
 
-  # Fetch and display the latest resource statuses
   aws cloudformation describe-stack-resources \
     --stack-name "$STACK_NAME" \
     --query "StackResources[*].[LogicalResourceId, ResourceType, ResourceStatus]" \
     --output text | while read -r resource_id resource_type resource_status; do
     
-    # Apply color based on resource status
     if [[ "$resource_status" == "CREATE_IN_PROGRESS" ]]; then
       echo -e "${GRAY}$resource_id ($resource_type) -- $resource_status${RESET}"
     elif [[ "$resource_status" == "CREATE_COMPLETE" ]]; then
@@ -203,7 +208,6 @@ while true; do
     fi
   done
 
-  # Check final stack status
   FINAL_STATUS=$(aws cloudformation describe-stacks \
     --stack-name "$STACK_NAME" \
     --query "Stacks[0].StackStatus" --output text)
@@ -222,6 +226,5 @@ while true; do
     break
   fi
 
-  # Sleep for 10 seconds
   sleep 8
 done
