@@ -3,6 +3,7 @@ ELB/terraform/.terraform.lock.hcl
 ELB/terraform/.terraform/
 ELB/terraform/terraform.tfstate
 ELB/terraform/terraform.tfstate.backup
+efs/MyKeyPair.pem
 
 # Generic Terraform ignores
 *.terraform.lock.hcl
