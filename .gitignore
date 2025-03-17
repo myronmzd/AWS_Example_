@@ -1,5 +1,18 @@
-ELB/terraform/.terraform.lock.hcl  
-ELB/terraform/.terraform/  
-ELB/terraform/terraform.tfstate  
-ELB/terraform/terraform.tfstate.backup  
+# Ignore Terraform-related files
+ELB/terraform/.terraform.lock.hcl
+ELB/terraform/.terraform/
+ELB/terraform/terraform.tfstate
+ELB/terraform/terraform.tfstate.backup
+
+# Generic Terraform ignores
+*.terraform.lock.hcl
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfplan
+
+# Ignore SSH private keys
 *.pem

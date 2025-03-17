@@ -108,7 +108,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          sudo su -ec2-user
+          sudo su - ec2-user
           yum update -y
           yum install -y amazon-ssm-agent
           systemctl enable amazon-ssm-agent
