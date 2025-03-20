@@ -45,3 +45,44 @@ aws ec2 describe-instance-types --query "sort_by(InstanceTypes[?starts_with(Inst
 
 # Sort by vCPUs (Ascending)
 aws ec2 describe-instance-types --query "sort_by(InstanceTypes[?starts_with(InstanceType, 't')], &VCpuInfo.DefaultVCpus)[].[InstanceType, MemoryInfo.SizeInMiB, VCpuInfo.DefaultVCpus]" --output table
+
+
+
+🚀 Steps to Set Up Multi-AZ ASG with CPU-Based Scaling
+1️⃣ Create an Auto Scaling Group (ASG) Across Multiple AZs
+When defining your ASG, select multiple subnets from different AZs in the same region.
+This ensures AWS will launch instances across AZs and rebalance if one AZ fails.
+2️⃣ Attach a Scaling Policy Based on CPU Utilization
+Use Target Tracking Scaling Policy (simpler) or Step Scaling (more control).
+Example Target Tracking Policy:
+Target Metric: Average CPU Utilization
+Threshold: Scale out when CPU > 60%
+Scale in when CPU < 30%
+3️⃣ Use an Elastic Load Balancer (ELB)
+Attach an Application Load Balancer (ALB) or Network Load Balancer (NLB).
+It will distribute traffic evenly across instances in different AZs.
+4️⃣ Enable Health Checks
+Use EC2 Health Checks or ELB Health Checks to detect and replace unhealthy instances.
+✅ Example AWS CLI Command to Create ASG with Multi-AZ and CPU-Based Scaling
+bash
+Copy
+Edit
+aws autoscaling create-auto-scaling-group \
+    --auto-scaling-group-name my-asg \
+    --launch-template LaunchTemplateName=my-template,Version=$Latest \
+    --min-size 1 --max-size 5 --desired-capacity 2 \
+    --vpc-zone-identifier "subnet-abc123,subnet-def456" \
+    --health-check-type ELB --health-check-grace-period 300 \
+    --load-balancer-names my-load-balancer \
+    --tags Key=Name,Value=my-instance
+
+aws autoscaling put-scaling-policy \
+    --auto-scaling-group-name my-asg \
+    --policy-name cpu-scale-out \
+    --policy-type TargetTrackingScaling \
+    --target-tracking-configuration '{
+        "PredefinedMetricSpecification": {
+            "PredefinedMetricType": "ASGAverageCPUUtilization"
+        },
+        "TargetValue": 60.0
+    }'
