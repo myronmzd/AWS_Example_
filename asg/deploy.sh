@@ -39,6 +39,10 @@ Parameters:
       - t3.nano
       - t3.small
     Default: t2.micro
+  KeyPairName:
+    Type: String
+    Description: "Name of an existing EC2 Key Pair for SSH access"
+    Default: MyKeyPair
   Ec2Ami:
     Type: String
     Default: $Ec2_ami
@@ -205,6 +209,7 @@ Resources:
     Properties: 
       LaunchTemplateName: "MyLaunchTemplate"
       LaunchTemplateData:
+        KeyName: !Ref KeyPairName
         SecurityGroupIds:
           - !Ref InstanceSecurityGroup
         ImageId: !Ref Ec2Ami
@@ -244,6 +249,7 @@ Resources:
   myASG:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
+      AutoScalingGroupName: "MyAutoScalingGroup"
       LaunchTemplate:
         LaunchTemplateId: !Ref MyLaunchTemplate
         Version: !GetAtt MyLaunchTemplate.LatestVersionNumber
@@ -315,9 +321,9 @@ while true; do
   echo "=============================="
 
   while IFS=$'\t' read -r resource_id resource_type resource_status; do
-    if [[ "$resource_status" == "CREATE_IN_PROGRESS" ]]; then
+    if [[ "$resource_status" == "⏳ CREATE_IN_PROGRESS" ]]; then
       echo -e "${GRAY}$resource_id ($resource_type) -- $resource_status${RESET}"
-    elif [[ "$resource_status" == "CREATE_COMPLETE" ]]; then
+    elif [[ "$resource_status" == "✅ CREATE_COMPLETE" ]]; then
       echo -e "${GREEN}$resource_id ($resource_type) -- $resource_status${RESET}"
     else
       echo "$resource_id ($resource_type) -- $resource_status"
@@ -331,7 +337,7 @@ while true; do
     --stack-name "$STACK_NAME" \
     --query "Stacks[0].StackStatus" --output text)
 
-  if [[ "$FINAL_STATUS" == "CREATE_COMPLETE" ]]; then
+  if [[ "$FINAL_STATUS" == "✅ CREATE_COMPLETE" ]]; then
     echo -e "\n=============================="
     echo -e "${GREEN}Final Stack Status: $FINAL_STATUS"
     echo "All resources are started.${RESET}"
@@ -344,6 +350,5 @@ while true; do
     echo "=============================="
     break
   fi
-
   sleep 8
 done
