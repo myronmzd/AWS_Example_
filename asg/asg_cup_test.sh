@@ -1,97 +1,136 @@
 #!/bin/bash
 
-# Set region
-REGION="ap-south-1"
-KEY_NAME="MyKeyPair"
+# Variables
 ASG_NAME="MyAutoScalingGroup"
+REGION="ap-south-1"
+KEY_PATH="MyKeyPair.pem"  # Update this with your key path
+STRESS_DURATION=300
 
-# 1. Check if key pair exists
-echo "🔑 Checking key pair..."
-if ! aws ec2 describe-key-pairs --region $REGION --key-names $KEY_NAME &>/dev/null; then
-    echo "❌ Key pair $KEY_NAME not found in region $REGION"
+# Color codes for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# Error handling
+set -e
+trap 'echo "Error on line $LINENO"' ERR
+
+# Check if key file exists
+if [ ! -f "${KEY_PATH/#\~/$HOME}" ]; then
+    echo -e "${RED}❌ SSH key not found at $KEY_PATH${NC}"
+    echo "Please update KEY_PATH in the script with your correct key location"
     exit 1
 fi
 
-# 2. Get instance details
-echo "🔎 Getting instance details..."
-INSTANCE_INFO=$(aws ec2 describe-instances \
-    --region $REGION \
-    --filters "Name=instance-state-name,Values=running" \
-    --query 'Reservations[*].Instances[*].[InstanceId,PublicIpAddress]' \
-    --output text)
+# Ensure correct key permissions
+chmod 400 "${KEY_PATH/#\~/$HOME}"
 
-if [ -z "$INSTANCE_INFO" ]; then
-    echo "❌ No running instances found"
+# Step 1: Get the Public IP of the running ASG instance
+echo -e "${YELLOW}🔎 Fetching instance details...${NC}"
+INSTANCE_IP=$(aws ec2 describe-instances \
+    --filters "Name=tag:aws:autoscaling:groupName,Values=$ASG_NAME" "Name=instance-state-name,Values=running" \
+    --query 'Reservations[0].Instances[0].PublicIpAddress' \
+    --output text \
+    --region $REGION)
+
+if [[ -z "$INSTANCE_IP" ]]; then
+    echo -e "${RED}❌ No running instance found in ASG $ASG_NAME!${NC}"
     exit 1
 fi
 
-INSTANCE_ID=$(echo $INSTANCE_INFO | awk '{print $1}')
-INSTANCE_IP=$(echo $INSTANCE_INFO | awk '{print $2}')
+echo -e "${GREEN}✅ Found running instance at $INSTANCE_IP${NC}"
 
-# 2.2 Echo initial ASG state
-echo "📊 Initial ASG State:"
-aws autoscaling describe-auto-scaling-groups \
-    --region $REGION \
-    --auto-scaling-group-name $ASG_NAME
-
-# 3. SSH and run stress test
-echo "⚙️ Connecting to instance $INSTANCE_IP and running stress test..."
-ssh -i ~/.ssh/$KEY_NAME.pem -o StrictHostKeyChecking=accept-new ec2-user@$INSTANCE_IP << 'EOF'
-    # 3.1 & 3.2 Check and install stress
+# Step 2: Connect via SSH and generate CPU stress
+echo -e "${YELLOW}⚙️ Connecting to instance and running CPU stress test...${NC}"
+ssh -i "${KEY_PATH/#\~/$HOME}" \
+    -o StrictHostKeyChecking=no \
+    -o ConnectTimeout=10 \
+    ec2-user@"$INSTANCE_IP" << 'EOF'
+    # Install stress if not present
     if ! command -v stress &>/dev/null; then
-        echo "Installing stress utility..."
-        sudo yum install -y epel-release
-        sudo yum install -y stress --enablerepo=epel
+        echo "📦 Installing stress utility..."
+        if grep -q "Amazon Linux release 2023" /etc/os-release; then
+            sudo dnf install -y stress
+        elif grep -q "Amazon Linux release 2" /etc/os-release; then
+            sudo amazon-linux-extras install epel -y
+            sudo yum install -y stress
+        else
+            sudo yum install -y epel-release
+            sudo yum install -y stress
+        fi
     fi
 
-    # 3.3 Run stress test
-    echo "Starting CPU stress test..."
-    stress --cpu 2 --timeout 180s &
+    # Verify stress installation
+    if ! command -v stress &>/dev/null; then
+        echo "❌ Failed to install stress utility"
+        exit 1
+    fi
+
+    # Kill any existing stress processes
+    echo "🧹 Cleaning up any existing stress processes..."
+    sudo pkill stress || true
+    
+    # Start stress test in background
+    echo "🚀 Running stress test..."
+    stress --cpu 2 --timeout 300s &
     STRESS_PID=$!
 
-    # 3.4 Wait for stress test to complete
-    sleep 180
-    if ps -p $STRESS_PID > /dev/null; then
-        kill $STRESS_PID
-    fi
-    echo "Stress test completed"
+    # Show current CPU usage
+    echo "📊 Initial CPU usage:"
+    top -b -n 1 | head -n 5
+
+    # Monitor CPU usage for a short while
+    for i in {1..5}; do
+        sleep 30
+        echo "📈 CPU usage at $(date):"
+        top -b -n 1 | head -n 5
+    done
 EOF
 
-# 4. Check number of instances after stress
-echo "⏳ Waiting for ASG to respond (60 seconds)..."
-sleep 60
-echo "📊 Current ASG State:"
+# Step 3: Monitor Auto Scaling Group
+echo -e "${YELLOW}📊 Monitoring Auto Scaling Group for new instances...${NC}"
+echo "Initial ASG state:"
 aws autoscaling describe-auto-scaling-groups \
-    --region $REGION \
-    --auto-scaling-group-name $ASG_NAME
+    --auto-scaling-group-name "$ASG_NAME" \
+    --region "$REGION" \
+    --query 'AutoScalingGroups[0].Instances[*].[InstanceId,LifecycleState]' \
+    --output table
 
-# 5. Echo ASG activities
-echo "📋 Recent ASG Activities:"
+# Monitor in a loop
+echo -e "${YELLOW}Monitoring ASG changes... (Press Ctrl+C to stop)${NC}"
+for i in {1..30}; do
+    echo "Check $i of 30..."
+    aws autoscaling describe-auto-scaling-groups \
+        --auto-scaling-group-name "$ASG_NAME" \
+        --region "$REGION" \
+        --query 'AutoScalingGroups[0].Instances[*].[InstanceId,LifecycleState]' \
+        --output table
+    
+    # Monitor CPU Utilization
+    echo "📈 CPU Utilization:"
+    aws cloudwatch get-metric-statistics \
+        --namespace AWS/EC2 \
+        --metric-name CPUUtilization \
+        --dimensions Name=AutoScalingGroupName,Value="$ASG_NAME" \
+        --statistics Average \
+        --start-time $(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%S) \
+        --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+        --period 60 \
+        --region "$REGION" \
+        --query 'Datapoints[*].[Timestamp,Average]' \
+        --output table
+
+    sleep 10
+done
+
+# Show final ASG activities
+echo -e "${YELLOW}📋 Recent ASG Activities:${NC}"
 aws autoscaling describe-scaling-activities \
-    --region $REGION \
-    --auto-scaling-group-name $ASG_NAME \
-    --max-items 5
+    --auto-scaling-group-name "$ASG_NAME" \
+    --max-items 5 \
+    --region "$REGION" \
+    --query 'Activities[*].[StartTime,Description,Cause]' \
+    --output table
 
-# 6. Get CloudWatch CPU metrics
-echo "📈 CPU Utilization Metrics:"
-aws cloudwatch get-metric-statistics \
-    --region $REGION \
-    --namespace AWS/EC2 \
-    --metric-name CPUUtilization \
-    --dimensions Name=InstanceId,Value=$INSTANCE_ID \
-    --start-time $(date -u -v-15M +%Y-%m-%dT%H:%M:%S) \
-    --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
-    --period 60 \
-    --statistics Average
-
-# 7. Get CloudWatch ASG metrics
-echo "📊 ASG Scaling Events:"
-aws cloudwatch get-metric-statistics \
-    --region $REGION \
-    --namespace AWS/AutoScaling \
-    --metric-name GroupTotalInstances \
-    --dimensions Name=AutoScalingGroupName,Value=$ASG_NAME \
-    --start-time $(date -u -v-15M +%Y-%m-%dT%H:%M:%S) \
-    --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
-    --period 60 \
-    --statistics Average
+echo -e "${GREEN}✅ Test completed!${NC}"

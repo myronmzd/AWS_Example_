@@ -104,3 +104,28 @@ i want create a .sh code in which it
 5  echo the asg activityes 
 6  echo the cloudwatch logs for spike in cup Utilization 
 7  echo the cloudwatch logs for creating the intance in asg base on cpu Utilization
+
+
+To test scaling more quickly:
+
+  ScalingPolicy:
+    Properties:
+      TargetTrackingConfiguration:
+        TargetValue: 50.0        # Lower threshold (e.g., 50%)
+        ScaleInCooldown: 300     # 5 minutes
+        ScaleOutCooldown: 60     # 1 minute - faster scale out
+
+  AutoScalingGroup:
+    Properties:
+      DefaultInstanceWarmup: 120  # Reduce warm-up time
+      Cooldown: 60               # Reduce general cooldown
+
+Copy
+
+Insert at cursor
+yaml
+Your stress test should:
+
+Run long enough to trigger scaling (at least 3-5 minutes)
+
+Generate enough CPU load (>50% in this case)
