@@ -86,3 +86,21 @@ aws autoscaling put-scaling-policy \
         },
         "TargetValue": 60.0
     }'
+
+
+
+
+i want create a .sh code in which it 
+1 find the key name check if its configure in give region REGION="ap-south-1" $REGION
+2 gets the current ip address of the intance with will be one instances 
+  2.1 check if no intance is running say no intance is running 
+  2.2 echo inital asg state with all details 
+3 when you get key for ssh key and then ip connect to them and 
+3.1 Install stress if not present 
+3.2 if not install it 
+3.3 and then stress --cpu 2 --timeout 180s which will make the cup go 100% for 3 mins
+3.4 clear any stress after 180 sec
+4  after sudden strees on one intance how many intance created
+5  echo the asg activityes 
+6  echo the cloudwatch logs for spike in cup Utilization 
+7  echo the cloudwatch logs for creating the intance in asg base on cpu Utilization
