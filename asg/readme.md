@@ -1,131 +1,68 @@
-# AWS T-family Instances (Sorted by Cost)
+# AWS Auto Scaling Group Deployment
 
-This list ranks AWS T-family instances from **least expensive** to **most expensive** based on general pricing trends. Prices may vary by region.
+This repository contains a script to deploy an AWS Auto Scaling Group using CloudFormation. The script sets up a VPC, subnets, an Internet Gateway, a Load Balancer, and an Auto Scaling Group with EC2 instances.
 
-## T-family Instances (Low to High Cost)
+## Prerequisites
 
-| Instance Type  | vCPUs | Memory (GiB) | Notes |
-|---------------|------|-------------|-------------------------------|
-| **t4g.nano**  | 2    | 0.5         | Cheapest, ARM-based (Graviton) |
-| **t3.nano**   | 2    | 0.5         | Cheapest in x86-based T3 family |
-| **t4g.micro** | 2    | 1           | More memory, still ARM-based |
-| **t3a.nano**  | 2    | 0.5         | AMD-based, slightly cheaper than t3 |
-| **t2.nano**   | 1    | 0.5         | Older generation |
-| **t3a.micro** | 2    | 1           | AMD-based alternative to t3.small |
-| **t4g.small** | 2    | 2           | Smallest Graviton-based with 2 GiB RAM |
-| **t3.small**  | 2    | 2           | Smallest in T3 family |
-| **t3a.small** | 2    | 2           | AMD-based, slightly cheaper |
-| **t2.micro**  | 1    | 1           | Free-tier eligible but older |
-| **t2.small**  | 1    | 2           | Slightly better than t2.micro |
-| **t3.medium** | 2    | 4           | Mid-tier T3 instance |
-| **t3a.medium**| 2    | 4           | AMD-based, slightly cheaper |
-| **t2.medium** | 2    | 4           | Older but still available |
-| **t3.large**  | 2    | 8           | More memory-intensive workloads |
-| **t3a.large** | 2    | 8           | AMD-based, lower cost than t3.large |
-| **t2.large**  | 2    | 8           | Older generation |
-| **t3.xlarge** | 4    | 16          | More compute power |
-| **t3a.xlarge**| 4    | 16          | AMD-based |
-| **t2.xlarge** | 4    | 16          | Older but still available |
-| **t3.2xlarge**| 8    | 32          | Most expensive in T3 |
-| **t3a.2xlarge**| 8   | 32          | AMD-based |
-| **t2.2xlarge**| 8    | 32          | Older but high memory |
+- AWS CLI installed and configured
+- An existing EC2 Key Pair
+- IAM permissions to create and manage AWS resources
 
-## Pricing Notes
-- **T4g instances** (Graviton, ARM-based) are usually **cheapest** in each category.
-- **T3a instances** (AMD-based) are slightly **cheaper** than T3.
-- **T2 instances** are older but still available in many regions.
-- **T3 and T3a** are more **cost-efficient** than T2 due to better performance per dollar.
+## Usage
 
-### Need pricing for a specific AWS region?
-Run this command in the AWS CLI:
-```bash
-# Sort by Memory (Ascending)
-aws ec2 describe-instance-types --query "sort_by(InstanceTypes[?starts_with(InstanceType, 't')], &MemoryInfo.SizeInMiB)[].[InstanceType, MemoryInfo.SizeInMiB, VCpuInfo.DefaultVCpus]" --output table
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/your-repo/AWS_Example_.git
+    cd AWS_Example_/asg
+    ```
 
+2. Make the `deploy.sh` script executable:
+    ```bash
+    chmod +x deploy.sh
+    ```
 
-# Sort by vCPUs (Ascending)
-aws ec2 describe-instance-types --query "sort_by(InstanceTypes[?starts_with(InstanceType, 't')], &VCpuInfo.DefaultVCpus)[].[InstanceType, MemoryInfo.SizeInMiB, VCpuInfo.DefaultVCpus]" --output table
+3. Run the deployment script:
+    ```bash
+    ./deploy.sh
+    ```
 
+## Script Details
 
+The `deploy.sh` script performs the following steps:
 
-🚀 Steps to Set Up Multi-AZ ASG with CPU-Based Scaling
-1️⃣ Create an Auto Scaling Group (ASG) Across Multiple AZs
-When defining your ASG, select multiple subnets from different AZs in the same region.
-This ensures AWS will launch instances across AZs and rebalance if one AZ fails.
-2️⃣ Attach a Scaling Policy Based on CPU Utilization
-Use Target Tracking Scaling Policy (simpler) or Step Scaling (more control).
-Example Target Tracking Policy:
-Target Metric: Average CPU Utilization
-Threshold: Scale out when CPU > 60%
-Scale in when CPU < 30%
-3️⃣ Use an Elastic Load Balancer (ELB)
-Attach an Application Load Balancer (ALB) or Network Load Balancer (NLB).
-It will distribute traffic evenly across instances in different AZs.
-4️⃣ Enable Health Checks
-Use EC2 Health Checks or ELB Health Checks to detect and replace unhealthy instances.
-✅ Example AWS CLI Command to Create ASG with Multi-AZ and CPU-Based Scaling
-bash
-Copy
-Edit
-aws autoscaling create-auto-scaling-group \
-    --auto-scaling-group-name my-asg \
-    --launch-template LaunchTemplateName=my-template,Version=$Latest \
-    --min-size 1 --max-size 5 --desired-capacity 2 \
-    --vpc-zone-identifier "subnet-abc123,subnet-def456" \
-    --health-check-type ELB --health-check-grace-period 300 \
-    --load-balancer-names my-load-balancer \
-    --tags Key=Name,Value=my-instance
+1. Retrieves the latest Amazon Linux 2 AMI.
+2. Retrieves the public IP address of the user.
+3. Creates a CloudFormation template (`template.yaml`) with the following resources:
+    - VPC
+    - Public Subnets
+    - Internet Gateway
+    - Route Table and Routes
+    - Security Groups
+    - Load Balancer and Target Group
+    - Launch Template
+    - Auto Scaling Group
+    - Scaling Policy
 
-aws autoscaling put-scaling-policy \
-    --auto-scaling-group-name my-asg \
-    --policy-name cpu-scale-out \
-    --policy-type TargetTrackingScaling \
-    --target-tracking-configuration '{
-        "PredefinedMetricSpecification": {
-            "PredefinedMetricType": "ASGAverageCPUUtilization"
-        },
-        "TargetValue": 60.0
-    }'
+4. Checks if the CloudFormation stack exists and updates or creates it accordingly.
+5. Monitors the stack creation/update status.
 
+## CloudFormation Template
 
+The CloudFormation template (`template.yaml`) includes the following resources:
 
+- **VPC**: A Virtual Private Cloud with DNS support and hostnames enabled.
+- **Subnets**: Two public subnets in different availability zones.
+- **Internet Gateway**: An Internet Gateway attached to the VPC.
+- **Route Table**: A route table with a default route to the Internet Gateway.
+- **Security Groups**: Security groups for the Load Balancer and EC2 instances.
+- **Load Balancer**: An Application Load Balancer with a listener and target group.
+- **Launch Template**: A launch template for EC2 instances with user data to install and start a web server.
+- **Auto Scaling Group**: An Auto Scaling Group with a scaling policy based on CPU utilization.
 
-i want create a .sh code in which it 
-1 find the key name check if its configure in give region REGION="ap-south-1" $REGION
-2 gets the current ip address of the intance with will be one instances 
-  2.1 check if no intance is running say no intance is running 
-  2.2 echo inital asg state with all details 
-3 when you get key for ssh key and then ip connect to them and 
-3.1 Install stress if not present 
-3.2 if not install it 
-3.3 and then stress --cpu 2 --timeout 180s which will make the cup go 100% for 3 mins
-3.4 clear any stress after 180 sec
-4  after sudden strees on one intance how many intance created
-5  echo the asg activityes 
-6  echo the cloudwatch logs for spike in cup Utilization 
-7  echo the cloudwatch logs for creating the intance in asg base on cpu Utilization
+## Monitoring
 
+The script monitors the CloudFormation stack status and provides updates on resource creation progress.
 
-To test scaling more quickly:
+## License
 
-  ScalingPolicy:
-    Properties:
-      TargetTrackingConfiguration:
-        TargetValue: 50.0        # Lower threshold (e.g., 50%)
-        ScaleInCooldown: 300     # 5 minutes
-        ScaleOutCooldown: 60     # 1 minute - faster scale out
-
-  AutoScalingGroup:
-    Properties:
-      DefaultInstanceWarmup: 120  # Reduce warm-up time
-      Cooldown: 60               # Reduce general cooldown
-
-Copy
-
-Insert at cursor
-yaml
-Your stress test should:
-
-Run long enough to trigger scaling (at least 3-5 minutes)
-
-Generate enough CPU load (>50% in this case)
+This project is licensed under the MIT License.
