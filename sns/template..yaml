@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  InputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      NotificationConfiguration:
+        TopicConfigurations:
+          - Event: s3:ObjectCreated:*
+            Topic: !Ref FilePutInS3
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref InputBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource: !Sub "arn:aws:s3:::${InputBucket}/*"
+
+  FilePutInS3:
+    Type: AWS::SNS::Topic
+
+  ProcessFile:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: process_file/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Events:
+        SNSFilePut:
+          Type: SNS
+          Properties:
+            Topic: !Ref FilePutInS3
+
+  Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FileProcessingTable
+      AttributeDefinitions:
+        - AttributeName: ID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  S3BucketName:
+    Value: !Ref InputBucket
+  SNSTopic:
+    Value: !Ref FilePutInS3
+  LambdaFunction:
+    Value: !Ref ProcessFile
+  DynamoDBTable:
+    Value: !Ref Table

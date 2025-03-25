@@ -1,10 +1,31 @@
 #!/usr/bin/env bash
 
-cd /workspace 
-curl -L "https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip" -o "smacli.zip"
-mv smacli.zip samcli.zip
-unzip samcli.zip -d sam-installation
-sudo ./sam-installation/install
-cd /workspaces/AWS_Example_/
+set -e  # Exit immediately if a command exits with a non-zero status
+
+ARCH=$(uname -m 2>/dev/null || echo "windows")
+OS=$(uname -s 2>/dev/null || echo "windows")
+
+if [[ "$OS" == "Linux" ]]; then
+    cd /workspace || exit 1
+    if [[ "$ARCH" == "x86_64" ]]; then
+        URL="https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip"
+    elif [[ "$ARCH" == "aarch64" ]]; then
+        URL="https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip"
+    else
+        echo "Unsupported Linux architecture: $ARCH"
+        exit 1
+    fi
+    curl -L "$URL" -o "samcli.zip"
+    unzip samcli.zip -d sam-installation
+    sudo ./sam-installation/install
+    rm -f "$PWD/samcli.zip"
+elif [[ "$OS" == "Windows_NT" ]]; then
+    echo "Detected Windows system"
+    choco install aws-sam-cli -y || winget install AWS.SAM.CLI
+else
+    echo "Unsupported operating system: $OS"
+    exit 1
 sam --version
-rm /workspaces/AWS_Example_/samcli.zip
+
+rm -f "$PWD/samcli.zip"
+rm -rf "$PWD/sam-installation"
