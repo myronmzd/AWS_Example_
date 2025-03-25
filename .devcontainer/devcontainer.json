@@ -1,5 +1,5 @@
 {
-  "name": "AWS CDK Dev Container",
+  "name": "Simple Linux Dev Container",
   "build": {
     "dockerfile": "Dockerfile"
   },
