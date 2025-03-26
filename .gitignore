@@ -17,3 +17,33 @@ terraform.tfstate.backup
 
 # Ignore SSH private keys
 *.pem
+
+
+# AWS SAM build artifacts
+.aws-sam/
+
+# Python virtual environments (if using Python)
+venv/
+.env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# AWS credentials (DO NOT COMMIT THESE!)
+.aws/
+*.env
+
+# AWS SAM deployment artifacts
+samconfig.toml
+packaged.yaml
+
+# Node.js dependencies (if using JavaScript/TypeScript)
+node_modules/
+npm-debug.log
+yarn.lock
+
+# IDE/editor settings
+.vscode/
+.idea/
+.DS_Store
