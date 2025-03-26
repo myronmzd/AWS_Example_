@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  InputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      NotificationConfiguration:
+        TopicConfigurations:
+          - Event: s3:ObjectCreated:*
+            Topic: !Ref S3EventSNSTopic
+
+  OutputBucket:
+    Type: AWS::S3::Bucket
+
+  S3EventSNSTopic:
+    Type: AWS::SNS::Topic
+
+  S3EventSNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref S3EventSNSTopic
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "sns:Publish"
+            Resource: !Ref S3EventSNSTopic
+            Condition:
+              ArnLike:
+                aws:SourceArn: !GetAtt InputBucket.Arn
+
+  S3FileProcessorLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      Handler: app.lambda_handler
+      CodeUri: src/
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref InputBucket
+        - S3WritePolicy:
+            BucketName: !Ref OutputBucket
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt S3EventSNSTopic.TopicName
+      Events:
+        S3Event:
+          Type: SNS
+          Properties:
+            Topic: !Ref S3EventSNSTopic
+
+Outputs:
+  InputBucketName:
+    Value: !Ref InputBucket
+  OutputBucketName:
+    Value: !Ref OutputBucket
+  LambdaFunction:
+    Value: !Ref S3FileProcessorLambda
