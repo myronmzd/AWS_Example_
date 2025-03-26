@@ -1,15 +1,21 @@
 {
-  "name": "Simple Linux Dev Container",
-  "build": {
-    "dockerfile": "Dockerfile"
+  "name": "AWS Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/devcontainers/features/python:1": {},
+    "ghcr.io/devcontainers/features/aws-sam-cli:1": {}
+  },
+  "containerEnv": {
+    "AWS_CLI_AUTO_PROMPT": "on-partial"
   },
   "customizations": {
     "vscode": {
       "extensions": [
-        "dbaeumer.vscode-eslint",
+        "hashicorp.terraform",
         "amazonwebservices.aws-toolkit-vscode"
       ]
     }
   },
-  "updateContentCommand": "echo 'Everything is up to date!'"
+  "remoteUser": "vscode"
 }
