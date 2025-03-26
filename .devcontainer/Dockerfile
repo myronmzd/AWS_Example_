@@ -1,9 +1,9 @@
-# Install Node.js, AWS CLI, and AWS SAM CLI
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    nodejs npm awscli unzip && \
-    npm install -g aws-cdk && \
-    pip install --no-cache-dir boto3 aws-sam-cli && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    nodejs npm awscli unzip python3-pip && \
+    npm install -g aws-cdk aws-sam-cli && \
+    pip install --no-cache-dir boto3 && \
+    apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
 ENV AWS_CLI_AUTO_PROMPT=on-partial
