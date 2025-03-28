@@ -4,13 +4,9 @@
 This project implements an automated notification system using AWS S3 and SNS. When files are uploaded to an S3 bucket, the system processes them and sends formatted email notifications via SNS.
 
 ## Architecture
-
-Copy
-
-Insert at cursor
-markdown
+```
 Input Bucket → Lambda → Output Bucket → SNS → Email Notification
-
+```
 
 ## Features
 - Automated file processing notifications
@@ -32,44 +28,34 @@ Input Bucket → Lambda → Output Bucket → SNS → Email Notification
 - IAM Roles & Policies
 
 ## Quick Setup
-1. Clone the repository
+### 1. Clone the repository
 ```bash
 git clone <repository-url>
 cd terraform_sns
+```
 
-Copy
-
-Insert at cursor
-text
-Update variables in terraform.tfvars:
-
+### 2. Update variables in `terraform.tfvars`:
+```hcl
 input_bucket_name  = "XXXXXXXXXXXXXXX"
 output_bucket_name = "XXXXXXXXXXXXXXXX"
 email_endpoint     = "your-email@example.com"
+```
 
-Copy
-
-Insert at cursor
-hcl
-Initialize and apply Terraform:
-
+### 3. Initialize and apply Terraform:
+```bash
 terraform init
 terraform plan
 terraform apply
+```
 
-Copy
+### 4. Confirm SNS subscription via email
 
-Insert at cursor
-bash
-Confirm SNS subscription via email
+## Usage
+1. Upload a file to the input bucket.
+2. System processes the file to the output bucket.
+3. Receive a formatted email notification:
 
-Usage
-Upload a file to the input bucket
-
-System processes the file to output bucket
-
-Receive formatted email notification:
-
+```
 📋 File Processing Notification
 
 ✅ Status: Successfully Processed
@@ -79,18 +65,14 @@ Receive formatted email notification:
 
 🔗 Access Your File:
 https://bucket-name.s3.region.amazonaws.com/example.csv
+```
 
-
-Email tested 
+### Email Tested
 ![image](https://github.com/user-attachments/assets/e4b21140-1786-46f9-9018-804013c16137)
 
-Copy
-
-Insert at cursor
-text
-Configuration
-Key variables in variables.tf:
-
+## Configuration
+Key variables in `variables.tf`:
+```hcl
 variable "input_bucket_name" {
   description = "Name of the input S3 bucket"
   type        = string
@@ -105,49 +87,34 @@ variable "email_endpoint" {
   description = "Email address for notifications"
   type        = string
 }
+```
 
-Copy
-
-Insert at cursor
-hcl
-Clean Up
+## Clean Up
 Remove all resources:
-
+```bash
 terraform destroy
+```
 
-Copy
+## Troubleshooting
+### Common issues:
+#### No Email Notifications
+- Check email subscription confirmation.
+- Verify SNS topic policy.
 
-Insert at cursor
-bash
-Troubleshooting
-Common issues:
+#### Processing Failures
+- Check Lambda CloudWatch logs.
+- Verify IAM permissions.
 
-No Email Notifications
+## Security
+- S3 buckets encrypted at rest.
+- Least privilege IAM policies.
+- Secure Lambda execution.
 
-Check email subscription confirmation
+## Contributing
+1. Fork the repository.
+2. Create a feature branch.
+3. Submit a pull request.
 
-Verify SNS topic policy
-
-Processing Failures
-
-Check Lambda CloudWatch logs
-
-Verify IAM permissions
-
-Security
-S3 buckets encrypted at rest
-
-Least privilege IAM policies
-
-Secure Lambda execution
-
-Contributing
-Fork the repository
-
-Create feature branch
-
-Submit pull request
-
-License
+## License
 MIT License
 
