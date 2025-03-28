@@ -17,7 +17,7 @@ module "input" {
 
 module "output" {
   source             = "./modules/output"
-  output_bucket_name = "my-input-bucket-${random_string.bucket_suffix2.result}"
+  output_bucket_name = "my-output-bucket-${random_string.bucket_suffix2.result}"
 }
 
 module "compute" {

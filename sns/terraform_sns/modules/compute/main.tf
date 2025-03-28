@@ -5,7 +5,7 @@ resource "aws_sns_topic" "file_processing_topic" {
 
 # Email subscription for SNS topic
 resource "aws_sns_topic_subscription" "email_subscription" {
-  topic_arn = aws_sns_topic.file_processing_topic.arn
+  topic_arn = aws_sns_topic.file_processing_topic.arn  
   protocol  = "email"
   endpoint  = var.email_endpoint  # Add this variable to your variables.tf
 }
@@ -38,17 +38,6 @@ resource "aws_s3_bucket_notification" "input_bucket_trigger" {
   depends_on = [aws_lambda_permission.allow_s3]
 }
 
-# S3 notification for output bucket to SNS
-resource "aws_s3_bucket_notification" "output_bucket_notification" {
-  bucket = var.output_bucket_id
-
-  topic {
-    topic_arn = aws_sns_topic.file_processing_topic.arn
-    events    = ["s3:ObjectCreated:*"]
-  }
-
-  depends_on = [aws_sns_topic_policy.allow_s3_notification]
-}
 
 # Allow S3 to invoke Lambda
 resource "aws_lambda_permission" "allow_s3" {
@@ -113,7 +102,8 @@ resource "aws_iam_policy" "lambda_exec_policy" {
         Action = [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:GetBucketLocation"
         ]
         Resource = [
           var.input_bucket_arn,
@@ -149,3 +139,15 @@ resource "aws_iam_role_policy_attachment" "lambda_exec_policy" {
 }
 
 
+
+# # S3 notification for output bucket to SNS
+# resource "aws_s3_bucket_notification" "output_bucket_notification" {
+#   bucket = var.output_bucket_id
+
+#   topic {
+#     topic_arn = aws_sns_topic.file_processing_topic.arn
+#     events    = ["s3:ObjectCreated:*"]
+#   }
+
+#   depends_on = [aws_sns_topic_policy.allow_s3_notification]
+# }
