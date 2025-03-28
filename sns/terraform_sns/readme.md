@@ -82,8 +82,7 @@ https://bucket-name.s3.region.amazonaws.com/example.csv
 
 
 Email tested 
-![alt text](image.png)
-
+![image](https://github.com/user-attachments/assets/e4b21140-1786-46f9-9018-804013c16137)
 
 Copy
 
