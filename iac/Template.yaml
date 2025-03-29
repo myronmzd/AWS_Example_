@@ -6,4 +6,4 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: mys3-cnf-246810
-      # we don't need put a bucket name it will generate a ramdom name 
+      # we don't need put a bucket name it will generate a ramdom name
