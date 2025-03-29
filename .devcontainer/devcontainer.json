@@ -9,7 +9,7 @@
 	  "ghcr.io/devcontainers/features/terraform:1": {},
 	  "ghcr.io/devcontainers/features/python:1": {}
 	},
-	"postCreateCommand": "pip install boto3",
+	"postCreateCommand": "sudo apt update && sudo apt upgrade -y && sudo apt install -y pipx && pipx install boto3 && pipx install cfn-lint",
 	"customizations": {
 	  "vscode": {
 		"extensions": ["ms-python.python",
