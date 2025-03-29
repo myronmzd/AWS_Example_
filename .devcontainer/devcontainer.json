@@ -9,7 +9,12 @@
 	  "ghcr.io/devcontainers/features/terraform:1": {},
 	  "ghcr.io/devcontainers/features/python:1": {}
 	},
-	"postCreateCommand": "sudo apt update && sudo apt upgrade -y && sudo apt install -y pipx && pipx install boto3 && pipx install cfn-lint",
+	"postCreateCommand": [
+    "python3 -m venv /workspaces/.venv",
+    "echo 'source /workspaces/.venv/bin/activate' >> ~/.bashrc",
+    "source /workspaces/.venv/bin/activate",
+    "/workspaces/.venv/bin/pip install boto3 cfn-lint"
+	],
 	"customizations": {
 	  "vscode": {
 		"extensions": ["ms-python.python",
