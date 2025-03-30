@@ -1,0 +1,19 @@
+{
+    "MessageBody": {
+      "DataType" :"String",
+      "StringValue":"This is the cart of customer ABD"
+    }, 
+    "Item": {
+      "DataType": "String",
+      "StringValue": "soap"
+    },
+    "Payment": {
+      "DataType": "String",
+      "StringValue": "true"
+    },
+    "Cost": {
+      "DataType": "Number",
+      "StringValue": "10.99"
+    }
+}
+

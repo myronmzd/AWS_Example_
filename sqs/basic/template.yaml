@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "This example template shows how to create an Amazon SQS queue."
 Parameters: 
   AlarmEmail: 
-    Default: "jane.doe@example.com"
+    Default: "myronmzd22@gmail.com"
     Description: "Email address to notify of operational issues"
     Type: "String"
 Resources: 
@@ -17,3 +17,9 @@ Resources:
         - Endpoint: 
             Ref: "AlarmEmail"
           Protocol: "email"
+Outputs:
+  QueueURL:
+    Description: "URL of the created SQS queue"
+    Value: !Ref MyQueue
+    Export:
+      Name: !Sub "${AWS::StackName}-QueueURL"
