@@ -1,13 +1,28 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 {
 	"name": "Ubuntu",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:noble",
 	"features": {
-		"ghcr.io/devcontainers/features/aws-cli:1": {},
-		"ghcr.io/goldsam/dev-container-features/aws-sam-cli:1": {}
+	  "ghcr.io/devcontainers/features/aws-cli:1": {},
+	  "ghcr.io/devcontainers/features/terraform:1": {},
+	  "ghcr.io/devcontainers/features/python:1": {}
+	},
+	"postCreateCommand": [
+    "python3 -m venv /workspaces/.venv",
+    "echo 'source /workspaces/.venv/bin/activate' >> ~/.bashrc",
+    "source /workspaces/.venv/bin/activate",
+    "/workspaces/.venv/bin/pip install boto3 cfn-lint"
+	],
+	"customizations": {
+	  "vscode": {
+		"extensions": ["ms-python.python",
+		"hashicorp.terraform",
+      	"aws-toolkit.aws-toolkit-vscode"]
+	  }
 	}
+  }
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -23,4 +38,4 @@
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
-}
+
