@@ -10,3 +10,7 @@ aws cloudformation deploy \
 --stack-name $STACK_NAME \
 --on-failure DO_NOTHING
 
+# --capabilities CAPABILITY_NAMED_IAM \
+# --parameter-overrides \               
+#   Environment=dev \
+#   InstanceType=t2.micro \ dafd
