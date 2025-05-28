@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: A CloudFormation template to run an EC2 instance to connect to ElastiCache Redis Cluster 
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t3.micro
+  SubnetID: 
+    Type: String
+    Default:  subnet-0e6dc7b510da19976 
+  ImageID:
+    Type: String  
+    Default: ami-0e35ddab05955cf57
+  myVPC:
+    Type: String
+    Default: vpc-047c87ea8bd04e251
+  mysecurityGroup:
+    Type: String
+    Default: sg-0b8e60a84f14ce5a3
+
+Resources:
+  MyEC2Instance: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageID
+      SubnetId: !Ref SubnetID
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SecurityGroupIds:
+        - !GetAtt mysecurityGroup
+      UserData: !Base64 |
+        #!/bin/bash
+        yum update -y             # Update the package repository
+        yum install -y httpd      # Intall Apache
+        systemctl enable httpd    # Enable Apache to start on boot
+        systemctl start httpd     # Start the Apache service
+        echo "Hello from Apache" > /var/www/html/index.html  # Create a simple index page
+
+  # Create the IAM Role for the EC2 Instance
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: ec2.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2Role
+
+ 

@@ -12,6 +12,7 @@
 	"postCreateCommand": [
     "python3 -m venv /workspaces/.venv",
     "echo 'source /workspaces/.venv/bin/activate' >> ~/.bashrc",
+	"echo 'export AWS_CLI_AUTO_PROMPT=on' >> ~/.bashrc",
     "source /workspaces/.venv/bin/activate",
     "/workspaces/.venv/bin/pip install boto3 cfn-lint"
 	],
