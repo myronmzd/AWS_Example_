@@ -74,41 +74,54 @@ Replace /path/to/your-key.pem, /path/to/local-file, <EC2-SSH-Username>, and <EC2
 # Benchmark ElastiCache Instances
 After copying the benchmarking.py script to your EC2 instance, you can run it to test the performance of your Valkey and Redis ElastiCache instances.
 
-🔁 SET Operation
-Metric	Redis	Valkey	Winner
-Total Time	6.8298 s	6.9171 s	Redis
-Throughput	1464.16 ops/sec	1445.70 ops/sec	Redis
-Avg Latency	0.682 ms	0.691 ms	Redis
-p50 Latency	0.668 ms	0.674 ms	Redis
-p90 Latency	0.730 ms	0.735 ms	Redis
-p99 Latency	0.911 ms	1.199 ms	Redis
+# 🔥 Redis vs Valkey Benchmark Comparison
 
-🔍 GET Operation
-Metric	Redis	Valkey	Winner
-Total Time	6.6429 s	7.3413 s	Redis
-Throughput	1505.37 ops/sec	1362.15 ops/sec	Redis
-Avg Latency	0.663 ms	0.733 ms	Redis
-p50 Latency	0.646 ms	0.668 ms	Redis
-p90 Latency	0.714 ms	0.795 ms	Redis
-p99 Latency	0.925 ms	2.021 ms	Redis
+This document compares the performance of **Redis** and **Valkey** based on SET, GET, and DEL operations using standard benchmarking metrics.
 
-🗑️ DEL Operation
-Metric	Redis	Valkey	Winner
-Total Time	6.6955 s	6.8729 s	Redis
-Throughput	1493.55 ops/sec	1454.99 ops/sec	Redis
-Avg Latency	0.669 ms	0.686 ms	Redis
-p50 Latency	0.654 ms	0.669 ms	Redis
-p90 Latency	0.721 ms	0.730 ms	Redis
-p99 Latency	0.881 ms	1.282 ms	Redis
+---
 
-🏁 Conclusion
-Redis outperforms Valkey across all operations (SET, GET, DEL) in:
+## 📝 SET Operation
 
-Lower latency
+| **Metric**       | **Redis**     | **Valkey**    | **Winner** |
+|------------------|---------------|---------------|------------|
+| Total Time       | 6.8298 s      | 6.9171 s      | Redis      |
+| Throughput       | 1464.16 ops/sec | 1445.70 ops/sec | Redis   |
+| Avg Latency      | 0.682 ms      | 0.691 ms      | Redis      |
+| p50 Latency      | 0.668 ms      | 0.674 ms      | Redis      |
+| p90 Latency      | 0.730 ms      | 0.735 ms      | Redis      |
+| p99 Latency      | 0.911 ms      | 1.199 ms      | Redis      |
 
-Higher throughput
+---
 
-Faster completion times
+## 📥 GET Operation
+
+| **Metric**       | **Redis**     | **Valkey**    | **Winner** |
+|------------------|---------------|---------------|------------|
+| Total Time       | 6.6429 s      | 7.3413 s      | Redis      |
+| Throughput       | 1505.37 ops/sec | 1362.15 ops/sec | Redis   |
+| Avg Latency      | 0.663 ms      | 0.733 ms      | Redis      |
+| p50 Latency      | 0.646 ms      | 0.668 ms      | Redis      |
+| p90 Latency      | 0.714 ms      | 0.795 ms      | Redis      |
+| p99 Latency      | 0.925 ms      | 2.021 ms      | Redis      |
+
+---
+
+## 🗑️ DEL Operation
+
+| **Metric**       | **Redis**     | **Valkey**    | **Winner** |
+|------------------|---------------|---------------|------------|
+| Total Time       | 6.6955 s      | 6.8729 s      | Redis      |
+| Throughput       | 1493.55 ops/sec | 1454.99 ops/sec | Redis   |
+| Avg Latency      | 0.669 ms      | 0.686 ms      | Redis      |
+| p50 Latency      | 0.654 ms      | 0.669 ms      | Redis      |
+| p90 Latency      | 0.721 ms      | 0.730 ms      | Redis      |
+| p99 Latency      | 0.881 ms      | 1.282 ms      | Redis      |
+
+---
+
+## 🏁 Conclusion
+
+Across all operations — SET, GET, and DEL — **Redis** consistently outperforms **Valkey** in throughput, latency, and overall execution time. Redis remains the faster and more responsive choice based on this benchmark.
 
 ✅ Winner: Redis
 🔍 Why? It consistently provides better performance, especially with lower high-percentile latencies (p90/p99), which matter in real-world apps for user experience under load.
