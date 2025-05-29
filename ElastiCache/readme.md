@@ -74,57 +74,44 @@ Replace /path/to/your-key.pem, /path/to/local-file, <EC2-SSH-Username>, and <EC2
 # Benchmark ElastiCache Instances
 After copying the benchmarking.py script to your EC2 instance, you can run it to test the performance of your Valkey and Redis ElastiCache instances.
 
-# Valkey Benchmark Results
-📊 Benchmark Results:
-SET Operation
-  Total Time       : 6.9171 sec
-  Throughput       : 1445.70 ops/sec
-  Average Latency  : 0.691 ms
-  p50 Latency      : 0.674 ms
-  p90 Latency      : 0.735 ms
-  p99 Latency      : 1.199 ms
+🔁 SET Operation
+Metric	Redis	Valkey	Winner
+Total Time	6.8298 s	6.9171 s	Redis
+Throughput	1464.16 ops/sec	1445.70 ops/sec	Redis
+Avg Latency	0.682 ms	0.691 ms	Redis
+p50 Latency	0.668 ms	0.674 ms	Redis
+p90 Latency	0.730 ms	0.735 ms	Redis
+p99 Latency	0.911 ms	1.199 ms	Redis
 
-GET Operation
-  Total Time       : 7.3413 sec
-  Throughput       : 1362.15 ops/sec
-  Average Latency  : 0.733 ms
-  p50 Latency      : 0.668 ms
-  p90 Latency      : 0.795 ms
-  p99 Latency      : 2.021 ms
+🔍 GET Operation
+Metric	Redis	Valkey	Winner
+Total Time	6.6429 s	7.3413 s	Redis
+Throughput	1505.37 ops/sec	1362.15 ops/sec	Redis
+Avg Latency	0.663 ms	0.733 ms	Redis
+p50 Latency	0.646 ms	0.668 ms	Redis
+p90 Latency	0.714 ms	0.795 ms	Redis
+p99 Latency	0.925 ms	2.021 ms	Redis
 
-DEL Operation
-  Total Time       : 6.8729 sec
-  Throughput       : 1454.99 ops/sec
-  Average Latency  : 0.686 ms
-  p50 Latency      : 0.669 ms
-  p90 Latency      : 0.730 ms
-  p99 Latency      : 1.282 ms
-# Redis Benchmark Results
+🗑️ DEL Operation
+Metric	Redis	Valkey	Winner
+Total Time	6.6955 s	6.8729 s	Redis
+Throughput	1493.55 ops/sec	1454.99 ops/sec	Redis
+Avg Latency	0.669 ms	0.686 ms	Redis
+p50 Latency	0.654 ms	0.669 ms	Redis
+p90 Latency	0.721 ms	0.730 ms	Redis
+p99 Latency	0.881 ms	1.282 ms	Redis
 
-📊 Benchmark Results:
-SET Operation
-  Total Time       : 6.8298 sec
-  Throughput       : 1464.16 ops/sec
-  Average Latency  : 0.682 ms
-  p50 Latency      : 0.668 ms
-  p90 Latency      : 0.730 ms
-  p99 Latency      : 0.911 ms
+🏁 Conclusion
+Redis outperforms Valkey across all operations (SET, GET, DEL) in:
 
-GET Operation
-  Total Time       : 6.6429 sec
-  Throughput       : 1505.37 ops/sec
-  Average Latency  : 0.663 ms
-  p50 Latency      : 0.646 ms
-  p90 Latency      : 0.714 ms
-  p99 Latency      : 0.925 ms
+Lower latency
 
-DEL Operation
-  Total Time       : 6.6955 sec
-  Throughput       : 1493.55 ops/sec
-  Average Latency  : 0.669 ms
-  p50 Latency      : 0.654 ms
-  p90 Latency      : 0.721 ms
-  p99 Latency      : 0.881 ms
+Higher throughput
+
+Faster completion times
+
+✅ Winner: Redis
+🔍 Why? It consistently provides better performance, especially with lower high-percentile latencies (p90/p99), which matter in real-world apps for user experience under load.
 
 These results provide a comparison of the SET, GET, and DEL operation performance for both Valkey and Redis serverless caches. You can analyze these metrics to determine which engine better suits your application's needs.
 
