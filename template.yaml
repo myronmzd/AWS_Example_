@@ -48,7 +48,7 @@ Resources:
         import sys
 
         def benchmark(client, label, iterations=1000):
-            print(f"\\nBenchmarking: {label}")
+            print(f"\nBenchmarking: {label}")
             latencies = []
             for i in range(iterations):
                 key = f"key:{i}"

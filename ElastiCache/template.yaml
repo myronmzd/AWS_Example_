@@ -26,6 +26,7 @@ Resources:
       ImageId: !Ref ImageID
       SubnetId: !Ref SubnetID
       IamInstanceProfile: !Ref EC2InstanceProfile
+      KeyName: mykey
       SecurityGroupIds:
        - !Ref mysecurityGroup
       UserData: !Base64 |
@@ -39,46 +40,6 @@ Resources:
 
         # Install Python packages
         sudo apt install -y redis-tools
-
-        # Create the benchmarking.py file
-        tee /home/ubuntu/benchmarking.py > /dev/null << 'EOF'
-        import time
-        import redis
-        import numpy as np
-        import sys
-
-        def benchmark(client, label, iterations=1000):
-            print(f"\\nBenchmarking: {label}")
-            latencies = []
-            for i in range(iterations):
-                key = f"key:{i}"
-                value = f"value:{i}"
-                start = time.perf_counter()
-                client.set(key, value)
-                client.get(key)
-                client.delete(key)
-                end = time.perf_counter()
-                latencies.append(end - start)
-
-            latencies_ms = [l * 1000 for l in latencies]
-            print(f"{label} P90 latency: {np.percentile(latencies_ms, 90):.3f} ms")
-            print(f"{label} Avg latency: {np.mean(latencies_ms):.3f} ms")
-
-        if __name__ == "__main__":
-            if len(sys.argv) != 3:
-                print("Usage: python3 benchmarking.py <REDIS_HOST> <VALKEY_HOST>")
-                sys.exit(1)
-
-            redis_host = sys.argv[1]
-            valkey_host = sys.argv[2]
-
-            redis_client = redis.Redis(host=redis_host, port=6379)
-            valkey_client = redis.Redis(host=valkey_host, port=6379)
-
-            benchmark(redis_client, "Redis")
-            benchmark(valkey_client, "Valkey")
-        EOF
-        chmod +x /home/ubuntu/benchmarking.py
 
   # Create the IAM Role for the EC2 Instance
   EC2Role:
