@@ -36,8 +36,11 @@ Resources:
         # Install necessary packages
         sudo apt update -y             
         sudo apt upgrade -y  
-        sudo apt install -y python3-pip
-        sudo apt install -y python3-dev
+        sudo apt install -y python3-venv
+        python3 -m venv myenv
+        source myenv/bin/activate
+        pip install redis
+        
 
         # Install Python packages
         sudo apt install -y redis-tools
