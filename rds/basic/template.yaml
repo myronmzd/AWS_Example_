@@ -7,7 +7,7 @@ Parameters:
     Default: mydb
   DBUser:
     Type: String
-    Default: admin
+    Default: bob
   DBPassword:
     Type: String
     NoEcho: true
@@ -20,14 +20,14 @@ Parameters:
     Default: db.t3.micro
   AllowedIP:
     Type: String
-    Default: "103.195.202.209/32"
+    Default: "${MY_IP}"
     Description: CIDR allowed SSH / DB access
   Ec2Ami:
     Type: String
-    Default: "ami-0321cd3e0040c7000"
+    Default: "${Ec2_aim}"
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Default: "mykey"
+    Default: "${KEY_NAME}"
     Description: Existing key pair for Bastion SSH
 
 Resources:
@@ -144,4 +144,3 @@ Outputs:
   DBEndpoint:
     Description: Postgres endpoint DNS
     Value: !GetAtt MyDB.Endpoint.Address
-
