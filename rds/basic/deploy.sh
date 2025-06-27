@@ -2,7 +2,7 @@
 
 REGION="ap-south-1"
 STACK_NAME="MyRDSStack"
-KEY_NAME="mykey"  # Replace with your key pair name
+KEY_NAME="MyKeybas"  # Replace with your key pair name
 
 export AWS_PAGER=""
 export AWS_DEFAULT_OUTPUT=text  
@@ -95,6 +95,7 @@ Resources:
       CidrBlock: 10.0.1.0/24
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [0, !GetAZs '']
+  
   PublicSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
@@ -102,11 +103,13 @@ Resources:
       CidrBlock: 10.0.2.0/24
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [1, !GetAZs '']
+    
   SubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnetA
       RouteTableId: !Ref PublicRouteTable
+
   SubnetBRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:

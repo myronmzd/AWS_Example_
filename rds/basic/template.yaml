@@ -20,14 +20,14 @@ Parameters:
     Default: db.t3.micro
   AllowedIP:
     Type: String
-    Default: "${MY_IP}"
+    Default: "45.127.45.62/32"
     Description: CIDR allowed SSH / DB access
   Ec2Ami:
     Type: String
-    Default: "${Ec2_aim}"
+    Default: "ami-0321cd3e0040c7000"
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Default: "${KEY_NAME}"
+    Default: "MyKeybas"
     Description: Existing key pair for Bastion SSH
 
 Resources:
@@ -65,6 +65,7 @@ Resources:
       CidrBlock: 10.0.1.0/24
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [0, !GetAZs '']
+  
   PublicSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
@@ -72,11 +73,13 @@ Resources:
       CidrBlock: 10.0.2.0/24
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [1, !GetAZs '']
+    
   SubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnetA
       RouteTableId: !Ref PublicRouteTable
+
   SubnetBRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -144,3 +147,4 @@ Outputs:
   DBEndpoint:
     Description: Postgres endpoint DNS
     Value: !GetAtt MyDB.Endpoint.Address
+
