@@ -6,7 +6,6 @@
 	"image": "mcr.microsoft.com/devcontainers/base:noble",
 	"features": {
 	  "ghcr.io/devcontainers/features/aws-cli:1": {},
-	  "ghcr.io/devcontainers/features/terraform:1": {},
 	  "ghcr.io/devcontainers/features/python:latest": {}
 	},
 	"postCreateCommand": "sudo python3 -m venv /workspaces/.venv && . /workspaces/.venv/bin/activate && pip install --upgrade pip && pip install boto3 cfn-lint requests && echo 'source /workspaces/.venv/bin/activate' >> ~/.bashrc && echo 'export AWS_CLI_AUTO_PROMPT=off' >> ~/.bashrc",
